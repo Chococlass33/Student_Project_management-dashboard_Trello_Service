@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import Toolbar from "./Components/Toolbar/Toolbar";
-import { render } from "fusioncharts";
 
 class App extends Component {
   render() {
