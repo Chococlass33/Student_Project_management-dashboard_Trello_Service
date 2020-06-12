@@ -2,10 +2,9 @@ import React, { Component } from "react";
 import Toolbar from "./Components/Toolbar/Toolbar";
 import Board from "./Components/Board";
 import BoardHistory from "./Components/BoardHistory";
-import Home from "./Components/Home";
 import Activity from "./Components/Activity";
 import "react-dom";
-import { BrowserRouter as Router, Switch, Route } from "react-dom";
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 
 class App extends Component {
   render() {
@@ -13,7 +12,6 @@ class App extends Component {
       <Router>
         <div className="App">
           <Toolbar />
-          <Route path="/home" component={Home} />
           <Route path="/activity" component={Activity} />
           <Route path="/board" component={Board} />
           <Route path="/boardhistory" component={BoardHistory} />
