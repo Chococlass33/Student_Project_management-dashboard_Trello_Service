@@ -8,16 +8,17 @@ const toolbar = (props) => (
       <div className="toolbar_name">
         <a href="/">Student Project Dashboard- Trello</a>
       </div>
+      <div className="spacer" />
       <div className="toolbar_navigation-items">
         <ul>
           <li>
-            <a href="/">Student Details</a>
+            <a href="/">Home</a>
           </li>
           <li>
-            <a href="/">Project Details</a>
+            <a href="/">Activity</a>
           </li>
           <li>
-            <a href="/">Boards</a>
+            <a href="/">Board</a>
           </li>
           <li>
             <a href="/">Board History</a>
