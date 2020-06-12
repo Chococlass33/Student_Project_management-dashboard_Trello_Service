@@ -1,5 +1,6 @@
 import React from "react";
 import "./Toolbar.css";
+import { Link } from "react-router-dom";
 
 const toolbar = (props) => (
   <header className="toolbar">
@@ -11,15 +12,21 @@ const toolbar = (props) => (
       <div className="spacer" />
       <div className="toolbar_navigation-items">
         <ul>
-          <li>
-            <a href="/">Activity</a>
-          </li>
-          <li>
-            <a href="/">Board</a>
-          </li>
-          <li>
-            <a href="/">Board History</a>
-          </li>
+          <Link to="/Activity">
+            <li>
+              <a href="/">Activity</a>
+            </li>
+          </Link>
+          <Link to="/Board">
+            <li>
+              <a href="/">Board</a>
+            </li>
+          </Link>
+          <Link to="/BoardHistory">
+            <li>
+              <a href="/">BoardHistory</a>
+            </li>
+          </Link>
         </ul>
       </div>
     </nav>
