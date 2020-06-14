@@ -45,9 +45,11 @@ public class TrelloApplication {
                     .build().toUri();
             try {
                 WebhookResponse response = restTemplate.postForObject(url, webhook, WebhookResponse.class);
+                logger.info("Made Webhook");
                 logger.info(response.toString());
             } catch (HttpClientErrorException e) {
-                logger.info(e.getMessage());
+                logger.error("Unable to make webhook");
+                logger.error(e.getMessage());
             }
         };
     }
