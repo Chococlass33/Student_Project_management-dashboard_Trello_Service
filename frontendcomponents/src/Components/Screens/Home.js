@@ -6,7 +6,10 @@ function Home(props) {
     const values = queryString.parse(props.location.search)
     const history = useHistory();
     if (values.integrationId === undefined && values.projectId !== undefined) {
-        history.push("/addBoard")
+        history.push({
+            pathname: "/addBoard",
+            state: {projectId:values.projectId}
+        })
         return (
             <div>
                 Redirecting...
