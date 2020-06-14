@@ -1,21 +1,18 @@
 import React from "react";
-import {Component} from "react/cjs/react.production.min.js";
+import {useHistory} from 'react-router-dom';
 import queryString from 'query-string'
-class Home extends Component {
-    componentDidMount() {
-        const values = queryString.parse(this.props.location.search)
 
-        /* Check if we want to make a new integration, and if so redirect */
-        if (values.integrationId === undefined) {
-            //TODO: Redirect to the new integration page
-        } else {
-            //TODO: Just start displaying shit
-        }
-        console.log(values.projectId)
-        console.log(values.integrationId)
-    }
-
-    render() {
+function Home(props) {
+    const values = queryString.parse(props.location.search)
+    const history = useHistory();
+    if (values.integrationId === undefined && values.projectId !== undefined) {
+        history.push("/addBoard")
+        return (
+            <div>
+                Redirecting...
+            </div>
+        );
+    } else {
         return (
             <div>
                 <h1 style={{marginTop: "64px"}}>Home Page</h1>
