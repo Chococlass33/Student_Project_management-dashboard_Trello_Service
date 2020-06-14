@@ -12,6 +12,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.Set;
 
+/**
+ * Controller to handle requests related to the trello webhook.
+ * This includes the check that the webhook exists, as well as the subsequent action information
+ */
 @Controller // This means that this class is a Controller
 @RequestMapping(path = "/webhook") // This means URL's start with /demo (after Application path)
 public class WebhookController {
