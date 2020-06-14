@@ -1,18 +1,13 @@
 import React from "react";
 import {Component} from "react/cjs/react.production.min.js";
 import queryString from 'query-string'
-class Home extends Component {
+
+class AddBoard extends Component {
     componentDidMount() {
         const values = queryString.parse(this.props.location.search)
 
-        /* Check if we want to make a new integration, and if so redirect */
-        if (values.integrationId === undefined) {
-            //TODO: Redirect to the new integration page
-        } else {
-            //TODO: Just start displaying shit
-        }
         console.log(values.projectId)
-        console.log(values.integrationId)
+
     }
 
     render() {
@@ -23,6 +18,10 @@ class Home extends Component {
             </div>
         );
     }
+
+    generateAuthString() {
+        return "https://trello.com/1/authorize?expiration=never&name=Student%20Project%20Management%20Dashboard&scope=read&response_type=token&key=" + API_KEY
+    }
 }
 
-export default Home;
+export default AddBoard;

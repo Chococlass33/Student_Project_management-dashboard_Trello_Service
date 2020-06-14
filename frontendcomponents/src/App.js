@@ -3,8 +3,10 @@ import Toolbar from "./Components/Toolbar/Toolbar";
 import Board from "./Components/Screens/Board";
 import BoardHistory from "./Components/Screens/BoardHistory";
 import Activity from "./Components/Screens/Activity";
+import Home from "./Components/Screens/Home.js";
 import "react-dom";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import AddBoard from "./Components/Screens/AddBoard.js";
 
 class App extends Component {
   render() {
@@ -14,6 +16,7 @@ class App extends Component {
           <Toolbar />
           <Switch>
             <Route path="/" exact component={Home} />
+            <Route path="/addBoard" exact component={AddBoard} />
             <Route path="/activity" component={Activity} />
             <Route path="/board" component={Board} />
             <Route path="/boardhistory" component={BoardHistory} />
@@ -24,11 +27,5 @@ class App extends Component {
   }
 }
 
-const Home = () => (
-  <div>
-    <h1 style={{ marginTop: "64px" }}>Home Page</h1>
-    <p>Student ID</p>
-  </div>
-);
 
 export default App;
