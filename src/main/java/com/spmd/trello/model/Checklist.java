@@ -1,3 +1,5 @@
+package com.spmd.trello.model;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -5,30 +7,28 @@ import javax.persistence.Id;
 import java.sql.Timestamp;
 
 @Entity
-public class CheckItem
+public class Checklist
 {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     private String id;
-    private String idCheckList;
+    private String idCard;
     private String name;
-    private String nameData;
     private Float pos;
-    private String state;
     private Timestamp dateCreated;
     private Timestamp dateLastModified;
 
-    public CheckItem(String id, String idCheckList, String name, String nameData, Float pos, String state, Timestamp dateCreated, Timestamp dateLastModified)
+    public Checklist(String id, String idCard, String name, Float pos, Timestamp dateCreated, Timestamp dateLastModified)
     {
         this.id = id;
-        this.idCheckList = idCheckList;
+        this.idCard = idCard;
         this.name = name;
-        this.nameData = nameData;
         this.pos = pos;
-        this.state = state;
         this.dateCreated = dateCreated;
         this.dateLastModified = dateLastModified;
     }
+
+    protected Checklist(){}
 
     public String getId()
     {
@@ -40,14 +40,14 @@ public class CheckItem
         this.id = id;
     }
 
-    public String getIdCheckList()
+    public String getIdCard()
     {
-        return idCheckList;
+        return idCard;
     }
 
-    public void setIdCheckList(String idCheckList)
+    public void setIdCard(String idCard)
     {
-        this.idCheckList = idCheckList;
+        this.idCard = idCard;
     }
 
     public String getName()
@@ -60,16 +60,6 @@ public class CheckItem
         this.name = name;
     }
 
-    public String getNameData()
-    {
-        return nameData;
-    }
-
-    public void setNameData(String nameData)
-    {
-        this.nameData = nameData;
-    }
-
     public Float getPos()
     {
         return pos;
@@ -78,16 +68,6 @@ public class CheckItem
     public void setPos(Float pos)
     {
         this.pos = pos;
-    }
-
-    public String getState()
-    {
-        return state;
-    }
-
-    public void setState(String state)
-    {
-        this.state = state;
     }
 
     public Timestamp getDateCreated()

@@ -1,3 +1,5 @@
+package com.spmd.trello.model;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -5,27 +7,29 @@ import javax.persistence.Id;
 import java.sql.Timestamp;
 
 @Entity
-public class CardLabel
+public class BoardMembership
 {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     private String id;
-    private String idCard;
-    private String idLabel;
+    private String idBoard;
+    private String idMember;
+    private String memberType;
     private Timestamp dateCreated;
     private Timestamp dateLastModified;
 
-    public CardLabel(String id, String idCard, String idLabel, Timestamp dateCreated, Timestamp dateLastModified)
+    public BoardMembership(String id, String idBoard, String idMember, String memberType, Timestamp dateCreated, Timestamp dateLastModified)
     {
 
         this.id = id;
-        this.idCard = idCard;
-        this.idLabel = idLabel;
+        this.idBoard = idBoard;
+        this.idMember = idMember;
+        this.memberType = memberType;
         this.dateCreated = dateCreated;
         this.dateLastModified = dateLastModified;
     }
 
-    protected CardLabel(){}
+    protected BoardMembership(){}
 
     public String getId()
     {
@@ -37,24 +41,34 @@ public class CardLabel
         this.id = id;
     }
 
-    public String getIdCard()
+    public String getIdBoard()
     {
-        return idCard;
+        return idBoard;
     }
 
-    public void setIdCard(String idCard)
+    public void setIdBoard(String idBoard)
     {
-        this.idCard = idCard;
+        this.idBoard = idBoard;
     }
 
-    public String getIdLabel()
+    public String getIdMember()
     {
-        return idLabel;
+        return idMember;
     }
 
-    public void setIdLabel(String idLabel)
+    public void setIdMember(String idMember)
     {
-        this.idLabel = idLabel;
+        this.idMember = idMember;
+    }
+
+    public String getMemberType()
+    {
+        return memberType;
+    }
+
+    public void setMemberType(String memberType)
+    {
+        this.memberType = memberType;
     }
 
     public Timestamp getDateCreated()

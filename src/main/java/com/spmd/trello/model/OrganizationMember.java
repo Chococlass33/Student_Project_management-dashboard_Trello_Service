@@ -1,3 +1,5 @@
+package com.spmd.trello.model;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -5,28 +7,28 @@ import javax.persistence.Id;
 import java.sql.Timestamp;
 
 @Entity
-public class Label
+public class OrganizationMember
 {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     private String id;
-    private String idBoard;
-    private String name;
-    private String colour;
+    private String idOrganisation;
+    private String idMember;
     private Timestamp dateCreated;
     private Timestamp dateLastModified;
 
-    public Label(String id, String idBoard, String name, String colour, Timestamp dateCreated, Timestamp dateLastModified)
+    public OrganizationMember(String id, String idOrganisation, String idMember, Timestamp dateCreated, Timestamp dateLastModified)
     {
+
         this.id = id;
-        this.idBoard = idBoard;
-        this.name = name;
-        this.colour = colour;
+        this.idOrganisation = idOrganisation;
+        this.idMember = idMember;
         this.dateCreated = dateCreated;
         this.dateLastModified = dateLastModified;
     }
 
-    protected Label(){}
+    protected OrganizationMember(){}
+
 
     public String getId()
     {
@@ -38,34 +40,24 @@ public class Label
         this.id = id;
     }
 
-    public String getIdBoard()
+    public String getIdOrganisation()
     {
-        return idBoard;
+        return idOrganisation;
     }
 
-    public void setIdBoard(String idBoard)
+    public void setIdOrganisation(String idOrganisation)
     {
-        this.idBoard = idBoard;
+        this.idOrganisation = idOrganisation;
     }
 
-    public String getName()
+    public String getIdMember()
     {
-        return name;
+        return idMember;
     }
 
-    public void setName(String name)
+    public void setIdMember(String idMember)
     {
-        this.name = name;
-    }
-
-    public String getColour()
-    {
-        return colour;
-    }
-
-    public void setColour(String colour)
-    {
-        this.colour = colour;
+        this.idMember = idMember;
     }
 
     public Timestamp getDateCreated()

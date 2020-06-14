@@ -1,3 +1,5 @@
+package com.spmd.trello.model;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -5,26 +7,27 @@ import javax.persistence.Id;
 import java.sql.Timestamp;
 
 @Entity
-public class List
+public class CardLabel
 {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     private String id;
-    private String idBoard;
-    private String name;
-    private Float pos;
+    private String idCard;
+    private String idLabel;
     private Timestamp dateCreated;
     private Timestamp dateLastModified;
 
-    public List(String id, String idBoard, String name, Float pos, Timestamp dateCreated, Timestamp dateLastModified)
+    public CardLabel(String id, String idCard, String idLabel, Timestamp dateCreated, Timestamp dateLastModified)
     {
+
         this.id = id;
-        this.idBoard = idBoard;
-        this.name = name;
-        this.pos = pos;
+        this.idCard = idCard;
+        this.idLabel = idLabel;
         this.dateCreated = dateCreated;
         this.dateLastModified = dateLastModified;
     }
+
+    protected CardLabel(){}
 
     public String getId()
     {
@@ -36,34 +39,24 @@ public class List
         this.id = id;
     }
 
-    public String getIdBoard()
+    public String getIdCard()
     {
-        return idBoard;
+        return idCard;
     }
 
-    public void setIdBoard(String idBoard)
+    public void setIdCard(String idCard)
     {
-        this.idBoard = idBoard;
+        this.idCard = idCard;
     }
 
-    public String getName()
+    public String getIdLabel()
     {
-        return name;
+        return idLabel;
     }
 
-    public void setName(String name)
+    public void setIdLabel(String idLabel)
     {
-        this.name = name;
-    }
-
-    public Float getPos()
-    {
-        return pos;
-    }
-
-    public void setPos(Float pos)
-    {
-        this.pos = pos;
+        this.idLabel = idLabel;
     }
 
     public Timestamp getDateCreated()

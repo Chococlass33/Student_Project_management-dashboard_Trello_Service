@@ -1,3 +1,5 @@
+package com.spmd.trello.model;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -5,32 +7,30 @@ import javax.persistence.Id;
 import java.sql.Timestamp;
 
 @Entity
-public class Board
+public class CheckItem
 {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     private String id;
-    private String idOrganisation;
+    private String idCheckList;
     private String name;
-    private String desc;
-    private String descData;
-    private String shortLink;
+    private String nameData;
+    private Float pos;
+    private String state;
     private Timestamp dateCreated;
     private Timestamp dateLastModified;
 
-    public Board(String id, String idOrganisation, String name, String desc, String descData, String shortLink, Timestamp dateCreated, Timestamp dateLastModified)
+    public CheckItem(String id, String idCheckList, String name, String nameData, Float pos, String state, Timestamp dateCreated, Timestamp dateLastModified)
     {
         this.id = id;
-        this.idOrganisation = idOrganisation;
+        this.idCheckList = idCheckList;
         this.name = name;
-        this.desc = desc;
-        this.descData = descData;
-        this.shortLink = shortLink;
+        this.nameData = nameData;
+        this.pos = pos;
+        this.state = state;
         this.dateCreated = dateCreated;
         this.dateLastModified = dateLastModified;
     }
-
-    protected Board(){}
 
     public String getId()
     {
@@ -42,14 +42,14 @@ public class Board
         this.id = id;
     }
 
-    public String getIdOrganisation()
+    public String getIdCheckList()
     {
-        return idOrganisation;
+        return idCheckList;
     }
 
-    public void setIdOrganisation(String idOrganisation)
+    public void setIdCheckList(String idCheckList)
     {
-        this.idOrganisation = idOrganisation;
+        this.idCheckList = idCheckList;
     }
 
     public String getName()
@@ -62,34 +62,34 @@ public class Board
         this.name = name;
     }
 
-    public String getDesc()
+    public String getNameData()
     {
-        return desc;
+        return nameData;
     }
 
-    public void setDesc(String desc)
+    public void setNameData(String nameData)
     {
-        this.desc = desc;
+        this.nameData = nameData;
     }
 
-    public String getDescData()
+    public Float getPos()
     {
-        return descData;
+        return pos;
     }
 
-    public void setDescData(String descData)
+    public void setPos(Float pos)
     {
-        this.descData = descData;
+        this.pos = pos;
     }
 
-    public String getShortLink()
+    public String getState()
     {
-        return shortLink;
+        return state;
     }
 
-    public void setShortLink(String shortLink)
+    public void setState(String state)
     {
-        this.shortLink = shortLink;
+        this.state = state;
     }
 
     public Timestamp getDateCreated()

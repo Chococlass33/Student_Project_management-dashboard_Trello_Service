@@ -1,3 +1,5 @@
+package com.spmd.trello.model;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -5,25 +7,23 @@ import javax.persistence.Id;
 import java.sql.Timestamp;
 
 @Entity
-public class Member
+public class List
 {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     private String id;
-    private String memberType;
-    private String fullName;
-    private String email;
+    private String idBoard;
+    private String name;
+    private Float pos;
     private Timestamp dateCreated;
     private Timestamp dateLastModified;
 
-    protected Member(){}
-
-    public Member(String id, String memberType, String fullName, String email, Timestamp dateCreated, Timestamp dateLastModified)
+    public List(String id, String idBoard, String name, Float pos, Timestamp dateCreated, Timestamp dateLastModified)
     {
         this.id = id;
-        this.memberType = memberType;
-        this.fullName = fullName;
-        this.email = email;
+        this.idBoard = idBoard;
+        this.name = name;
+        this.pos = pos;
         this.dateCreated = dateCreated;
         this.dateLastModified = dateLastModified;
     }
@@ -38,34 +38,34 @@ public class Member
         this.id = id;
     }
 
-    public String getMemberType()
+    public String getIdBoard()
     {
-        return memberType;
+        return idBoard;
     }
 
-    public void setMemberType(String memberType)
+    public void setIdBoard(String idBoard)
     {
-        this.memberType = memberType;
+        this.idBoard = idBoard;
     }
 
-    public String getFullName()
+    public String getName()
     {
-        return fullName;
+        return name;
     }
 
-    public void setFullName(String fullName)
+    public void setName(String name)
     {
-        this.fullName = fullName;
+        this.name = name;
     }
 
-    public String getEmail()
+    public Float getPos()
     {
-        return email;
+        return pos;
     }
 
-    public void setEmail(String email)
+    public void setPos(Float pos)
     {
-        this.email = email;
+        this.pos = pos;
     }
 
     public Timestamp getDateCreated()

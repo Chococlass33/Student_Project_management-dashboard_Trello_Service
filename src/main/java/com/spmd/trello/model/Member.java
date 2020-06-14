@@ -1,3 +1,5 @@
+package com.spmd.trello.model;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -5,29 +7,28 @@ import javax.persistence.Id;
 import java.sql.Timestamp;
 
 @Entity
-public class BoardMembership
+public class Member
 {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     private String id;
-    private String idBoard;
-    private String idMember;
     private String memberType;
+    private String fullName;
+    private String email;
     private Timestamp dateCreated;
     private Timestamp dateLastModified;
 
-    public BoardMembership(String id, String idBoard, String idMember, String memberType, Timestamp dateCreated, Timestamp dateLastModified)
-    {
+    protected Member(){}
 
+    public Member(String id, String memberType, String fullName, String email, Timestamp dateCreated, Timestamp dateLastModified)
+    {
         this.id = id;
-        this.idBoard = idBoard;
-        this.idMember = idMember;
         this.memberType = memberType;
+        this.fullName = fullName;
+        this.email = email;
         this.dateCreated = dateCreated;
         this.dateLastModified = dateLastModified;
     }
-
-    protected BoardMembership(){}
 
     public String getId()
     {
@@ -39,26 +40,6 @@ public class BoardMembership
         this.id = id;
     }
 
-    public String getIdBoard()
-    {
-        return idBoard;
-    }
-
-    public void setIdBoard(String idBoard)
-    {
-        this.idBoard = idBoard;
-    }
-
-    public String getIdMember()
-    {
-        return idMember;
-    }
-
-    public void setIdMember(String idMember)
-    {
-        this.idMember = idMember;
-    }
-
     public String getMemberType()
     {
         return memberType;
@@ -67,6 +48,26 @@ public class BoardMembership
     public void setMemberType(String memberType)
     {
         this.memberType = memberType;
+    }
+
+    public String getFullName()
+    {
+        return fullName;
+    }
+
+    public void setFullName(String fullName)
+    {
+        this.fullName = fullName;
+    }
+
+    public String getEmail()
+    {
+        return email;
+    }
+
+    public void setEmail(String email)
+    {
+        this.email = email;
     }
 
     public Timestamp getDateCreated()

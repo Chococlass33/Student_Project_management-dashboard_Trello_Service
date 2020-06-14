@@ -1,3 +1,5 @@
+package com.spmd.trello.model;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -5,27 +7,28 @@ import javax.persistence.Id;
 import java.sql.Timestamp;
 
 @Entity
-public class CardMember
+public class Label
 {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     private String id;
-    private String idCard;
-    private String idMember;
+    private String idBoard;
+    private String name;
+    private String colour;
     private Timestamp dateCreated;
     private Timestamp dateLastModified;
 
-    public CardMember(String id, String idCard, String idMember, Timestamp dateCreated, Timestamp dateLastModified)
+    public Label(String id, String idBoard, String name, String colour, Timestamp dateCreated, Timestamp dateLastModified)
     {
-
         this.id = id;
-        this.idCard = idCard;
-        this.idMember = idMember;
+        this.idBoard = idBoard;
+        this.name = name;
+        this.colour = colour;
         this.dateCreated = dateCreated;
         this.dateLastModified = dateLastModified;
     }
 
-    protected CardMember(){}
+    protected Label(){}
 
     public String getId()
     {
@@ -37,24 +40,34 @@ public class CardMember
         this.id = id;
     }
 
-    public String getIdCard()
+    public String getIdBoard()
     {
-        return idCard;
+        return idBoard;
     }
 
-    public void setIdCard(String idCard)
+    public void setIdBoard(String idBoard)
     {
-        this.idCard = idCard;
+        this.idBoard = idBoard;
     }
 
-    public String getIdMember()
+    public String getName()
     {
-        return idMember;
+        return name;
     }
 
-    public void setIdMember(String idMember)
+    public void setName(String name)
     {
-        this.idMember = idMember;
+        this.name = name;
+    }
+
+    public String getColour()
+    {
+        return colour;
+    }
+
+    public void setColour(String colour)
+    {
+        this.colour = colour;
     }
 
     public Timestamp getDateCreated()

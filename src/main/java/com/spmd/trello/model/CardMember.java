@@ -1,3 +1,5 @@
+package com.spmd.trello.model;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -5,28 +7,27 @@ import javax.persistence.Id;
 import java.sql.Timestamp;
 
 @Entity
-public class OrganizationMember
+public class CardMember
 {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     private String id;
-    private String idOrganisation;
+    private String idCard;
     private String idMember;
     private Timestamp dateCreated;
     private Timestamp dateLastModified;
 
-    public OrganizationMember(String id, String idOrganisation, String idMember, Timestamp dateCreated, Timestamp dateLastModified)
+    public CardMember(String id, String idCard, String idMember, Timestamp dateCreated, Timestamp dateLastModified)
     {
 
         this.id = id;
-        this.idOrganisation = idOrganisation;
+        this.idCard = idCard;
         this.idMember = idMember;
         this.dateCreated = dateCreated;
         this.dateLastModified = dateLastModified;
     }
 
-    protected OrganizationMember(){}
-
+    protected CardMember(){}
 
     public String getId()
     {
@@ -38,14 +39,14 @@ public class OrganizationMember
         this.id = id;
     }
 
-    public String getIdOrganisation()
+    public String getIdCard()
     {
-        return idOrganisation;
+        return idCard;
     }
 
-    public void setIdOrganisation(String idOrganisation)
+    public void setIdCard(String idCard)
     {
-        this.idOrganisation = idOrganisation;
+        this.idCard = idCard;
     }
 
     public String getIdMember()

@@ -22,7 +22,7 @@ public class MainController {
     @PostMapping
     public @ResponseBody
     String receiveAction() {
-        logger.info("Action ping!");
+        logger.info("com.spmd.trello.model.Action ping!");
         return "";
     }
 

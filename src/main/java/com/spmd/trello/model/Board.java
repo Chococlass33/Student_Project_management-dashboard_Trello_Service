@@ -1,3 +1,5 @@
+package com.spmd.trello.model;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -5,28 +7,32 @@ import javax.persistence.Id;
 import java.sql.Timestamp;
 
 @Entity
-public class Checklist
+public class Board
 {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     private String id;
-    private String idCard;
+    private String idOrganisation;
     private String name;
-    private Float pos;
+    private String desc;
+    private String descData;
+    private String shortLink;
     private Timestamp dateCreated;
     private Timestamp dateLastModified;
 
-    public Checklist(String id, String idCard, String name, Float pos, Timestamp dateCreated, Timestamp dateLastModified)
+    public Board(String id, String idOrganisation, String name, String desc, String descData, String shortLink, Timestamp dateCreated, Timestamp dateLastModified)
     {
         this.id = id;
-        this.idCard = idCard;
+        this.idOrganisation = idOrganisation;
         this.name = name;
-        this.pos = pos;
+        this.desc = desc;
+        this.descData = descData;
+        this.shortLink = shortLink;
         this.dateCreated = dateCreated;
         this.dateLastModified = dateLastModified;
     }
 
-    protected Checklist(){}
+    protected Board(){}
 
     public String getId()
     {
@@ -38,14 +44,14 @@ public class Checklist
         this.id = id;
     }
 
-    public String getIdCard()
+    public String getIdOrganisation()
     {
-        return idCard;
+        return idOrganisation;
     }
 
-    public void setIdCard(String idCard)
+    public void setIdOrganisation(String idOrganisation)
     {
-        this.idCard = idCard;
+        this.idOrganisation = idOrganisation;
     }
 
     public String getName()
@@ -58,14 +64,34 @@ public class Checklist
         this.name = name;
     }
 
-    public Float getPos()
+    public String getDesc()
     {
-        return pos;
+        return desc;
     }
 
-    public void setPos(Float pos)
+    public void setDesc(String desc)
     {
-        this.pos = pos;
+        this.desc = desc;
+    }
+
+    public String getDescData()
+    {
+        return descData;
+    }
+
+    public void setDescData(String descData)
+    {
+        this.descData = descData;
+    }
+
+    public String getShortLink()
+    {
+        return shortLink;
+    }
+
+    public void setShortLink(String shortLink)
+    {
+        this.shortLink = shortLink;
     }
 
     public Timestamp getDateCreated()
