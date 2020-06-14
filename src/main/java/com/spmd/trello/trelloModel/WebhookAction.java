@@ -37,6 +37,7 @@ public class WebhookAction {
         }
     }
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Action {
         public String id;
         public Object data;
