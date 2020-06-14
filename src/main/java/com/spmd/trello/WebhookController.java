@@ -17,27 +17,40 @@ import java.util.Set;
 public class WebhookController {
     private static final Logger logger = LoggerFactory.getLogger(WebhookController.class);
 
+    /**
+     * Handles the initial HEAD request from trello to check if the webhook is active
+     * A HEAD request can also be handled by GET, making things simpler.
+     * <p>
+     * Just returns a 200 response code.
+     */
     @GetMapping
     public @ResponseBody
     String newWebhook() {
         return "";
     }
 
+    /**
+     * Handles a new action form trello
+     *
+     * @param body The information for the action
+     */
     @PostMapping
     public @ResponseBody
     String receiveAction(@RequestBody WebhookAction body) {
         if (isValidAction(body.action.type)) {
-            logger.info("Relevent Info");
-            logger.info(body.toString());
+            logger.info("Relevant Info");
         } else {
             logger.info("Ignoring");
-            logger.info(body.toString());
         }
+        logger.info(body.toString());
 
         return "";
     }
 
-    private static final Set<String> VALID_ACTIONS = Set.of("createCard");
+    /**
+     * The list of actions we want to filter for
+     */
+    private static final Set<String> VALID_ACTIONS = Set.of("createCard", "updateCard", "deleteCard");
 
     /**
      * Checks if the action type is one that we actually care about
