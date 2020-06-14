@@ -1,9 +1,6 @@
 package com.spmd.trello.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.sql.Timestamp;
 
 @Entity
@@ -12,7 +9,9 @@ public class CheckItem
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     private String id;
-    private String idCheckList;
+    @ManyToOne
+    @JoinColumn(name = "idCheckList",nullable = false)
+    private Checklist checkList;
     private String name;
     private String nameData;
     private Float pos;
@@ -23,7 +22,6 @@ public class CheckItem
     public CheckItem(String id, String idCheckList, String name, String nameData, Float pos, String state, Timestamp dateCreated, Timestamp dateLastModified)
     {
         this.id = id;
-        this.idCheckList = idCheckList;
         this.name = name;
         this.nameData = nameData;
         this.pos = pos;
@@ -40,16 +38,6 @@ public class CheckItem
     public void setId(String id)
     {
         this.id = id;
-    }
-
-    public String getIdCheckList()
-    {
-        return idCheckList;
-    }
-
-    public void setIdCheckList(String idCheckList)
-    {
-        this.idCheckList = idCheckList;
     }
 
     public String getName()
@@ -110,5 +98,15 @@ public class CheckItem
     public void setDateLastModified(Timestamp dateLastModified)
     {
         this.dateLastModified = dateLastModified;
+    }
+
+    public Checklist getCheckList()
+    {
+        return checkList;
+    }
+
+    public void setCheckList(Checklist checkList)
+    {
+        this.checkList = checkList;
     }
 }

@@ -1,9 +1,6 @@
 package com.spmd.trello.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.sql.Timestamp;
 
 @Entity
@@ -12,17 +9,21 @@ public class Action
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     private String id;
-    private String idMember;
+    @ManyToOne
+    @JoinColumn(name = "idMember",nullable = false)
+    private Member member;
     private String type;
     private String data;
     private Timestamp dateCreated;
     private Timestamp dateLastModified;
 
+
+
+
     protected Action() {}
 
-    public Action(String idMember, String type, String data, Timestamp dateCreated, Timestamp dateLastModified)
+    public Action(Member member, String type, String data, Timestamp dateCreated, Timestamp dateLastModified)
     {
-        this.idMember = idMember;
         this.type = type;
         this.data = data;
         this.dateCreated = dateCreated;
@@ -37,16 +38,6 @@ public class Action
     public void setId(String id)
     {
         this.id = id;
-    }
-
-    public String getIdMember()
-    {
-        return idMember;
-    }
-
-    public void setIdMember(String idMember)
-    {
-        this.idMember = idMember;
     }
 
     public String getType()
@@ -87,5 +78,15 @@ public class Action
     public void setDateLastModified(Timestamp dateLastModified)
     {
         this.dateLastModified = dateLastModified;
+    }
+
+    public Member getMember()
+    {
+        return member;
+    }
+
+    public void setMember(Member member)
+    {
+        this.member = member;
     }
 }

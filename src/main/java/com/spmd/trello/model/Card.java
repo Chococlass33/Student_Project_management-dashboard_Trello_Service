@@ -1,10 +1,9 @@
 package com.spmd.trello.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 public class Card
@@ -12,8 +11,12 @@ public class Card
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     private String id;
-    private String idList;
-    private String idBoard;
+    @ManyToOne
+    @JoinColumn(name = "idList",nullable = false)
+    private List list;
+    @ManyToOne
+    @JoinColumn(name = "idBoard",nullable = false)
+    private Board board;
     private String checkItemStates;
     private int closed;
     private Timestamp dateLastActivity;
@@ -27,11 +30,27 @@ public class Card
     private Timestamp dateCreated;
     private Timestamp dateLastModified;
 
+    @OneToMany(
+            mappedBy = "card",
+            cascade=CascadeType.ALL
+    )
+    private Set<CardMember> cardMembers;
+
+    @OneToMany(
+            mappedBy = "card",
+            cascade=CascadeType.ALL
+    )
+    private Set<CardLabel> cardLabels;
+
+    @OneToMany(
+            mappedBy = "card",
+            cascade=CascadeType.ALL
+    )
+    private Set<Checklist> checklists;
+
     public Card(String id, String idList, String idBoard, String checkItemStates, int closed, Timestamp dateLastActivity, String desc, String descData, Timestamp due, int dueComplete, String name, Float pos, String shortLink, Timestamp dateCreated, Timestamp dateLastModified)
     {
         this.id = id;
-        this.idList = idList;
-        this.idBoard = idBoard;
         this.checkItemStates = checkItemStates;
         this.closed = closed;
         this.dateLastActivity = dateLastActivity;
@@ -44,6 +63,9 @@ public class Card
         this.shortLink = shortLink;
         this.dateCreated = dateCreated;
         this.dateLastModified = dateLastModified;
+        cardMembers = new HashSet<>();
+        cardLabels = new HashSet<>();
+        checklists = new HashSet<>();
     }
 
     protected Card(){}
@@ -56,26 +78,6 @@ public class Card
     public void setId(String id)
     {
         this.id = id;
-    }
-
-    public String getIdList()
-    {
-        return idList;
-    }
-
-    public void setIdList(String idList)
-    {
-        this.idList = idList;
-    }
-
-    public String getIdBoard()
-    {
-        return idBoard;
-    }
-
-    public void setIdBoard(String idBoard)
-    {
-        this.idBoard = idBoard;
     }
 
     public String getCheckItemStates()
@@ -196,5 +198,68 @@ public class Card
     public void setDateLastModified(Timestamp dateLastModified)
     {
         this.dateLastModified = dateLastModified;
+    }
+
+    public Set<CardMember> getCardMembers()
+    {
+        return cardMembers;
+    }
+
+    public void setCardMembers(Set<CardMember> cardMembers)
+    {
+        this.cardMembers = cardMembers;
+        for (CardMember cardMember:cardMembers)
+        {
+            cardMember.setCard(this);
+        }
+    }
+
+    public Set<CardLabel> getCardLabels()
+    {
+        return cardLabels;
+    }
+
+    public void setCardLabels(Set<CardLabel> cardLabels)
+    {
+        this.cardLabels = cardLabels;
+        for (CardLabel cardLabel:cardLabels)
+        {
+            cardLabel.setCard(this);
+        }
+    }
+
+    public Set<Checklist> getChecklists()
+    {
+        return checklists;
+    }
+
+    public void setChecklists(Set<Checklist> checklists)
+    {
+        this.checklists = checklists;
+        this.cardLabels = cardLabels;
+        for (Checklist checklist:checklists)
+        {
+            checklist.setCard(this);
+        }
+    }
+
+    public Board getBoard()
+    {
+        return board;
+    }
+
+    public void setBoard(Board board)
+    {
+        this.board = board;
+    }
+
+    public List getList()
+    {
+        return list;
+    }
+
+    public void setList(List list)
+    {
+        this.list = list;
     }
 }

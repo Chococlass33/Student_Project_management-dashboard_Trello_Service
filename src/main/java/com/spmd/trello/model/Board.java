@@ -1,10 +1,9 @@
 package com.spmd.trello.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 public class Board
@@ -12,7 +11,9 @@ public class Board
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     private String id;
-    private String idOrganisation;
+    @ManyToOne
+    @JoinColumn(name = "idOrganisation",nullable = false)
+    private Organization organisation;
     private String name;
     private String desc;
     private String descData;
@@ -20,16 +21,43 @@ public class Board
     private Timestamp dateCreated;
     private Timestamp dateLastModified;
 
-    public Board(String id, String idOrganisation, String name, String desc, String descData, String shortLink, Timestamp dateCreated, Timestamp dateLastModified)
+    @OneToMany(
+            mappedBy = "board",
+            cascade=CascadeType.ALL
+    )
+    private Set<BoardMembership> boardMemberships;
+
+    @OneToMany(
+            mappedBy = "board",
+            cascade=CascadeType.ALL
+    )
+    private Set<Label> labels;
+
+    @OneToMany(
+            mappedBy = "board",
+            cascade=CascadeType.ALL
+    )
+    private Set<Card> cards;
+
+    @OneToMany(
+            mappedBy = "board",
+            cascade=CascadeType.ALL
+    )
+    private Set<List> lists;
+
+    public Board(String id, String name, String desc, String descData, String shortLink, Timestamp dateCreated, Timestamp dateLastModified)
     {
         this.id = id;
-        this.idOrganisation = idOrganisation;
         this.name = name;
         this.desc = desc;
         this.descData = descData;
         this.shortLink = shortLink;
         this.dateCreated = dateCreated;
         this.dateLastModified = dateLastModified;
+        boardMemberships = new HashSet<>();
+        labels = new HashSet<>();
+        cards = new HashSet<>();
+        lists = new HashSet<>();
     }
 
     protected Board(){}
@@ -42,16 +70,6 @@ public class Board
     public void setId(String id)
     {
         this.id = id;
-    }
-
-    public String getIdOrganisation()
-    {
-        return idOrganisation;
-    }
-
-    public void setIdOrganisation(String idOrganisation)
-    {
-        this.idOrganisation = idOrganisation;
     }
 
     public String getName()
@@ -112,5 +130,71 @@ public class Board
     public void setDateLastModified(Timestamp dateLastModified)
     {
         this.dateLastModified = dateLastModified;
+    }
+
+    public Organization getOrganisation()
+    {
+        return organisation;
+    }
+
+    public void setOrganisation(Organization organisation)
+    {
+        this.organisation = organisation;
+    }
+
+    public Set<BoardMembership> getBoardMemberships()
+    {
+        return boardMemberships;
+    }
+
+    public void setBoardMemberships(Set<BoardMembership> boardMemberships)
+    {
+        this.boardMemberships = boardMemberships;
+        for (BoardMembership boardMembership:boardMemberships)
+        {
+            boardMembership.setBoard(this);
+        }
+    }
+
+    public Set<Label> getLabels()
+    {
+        return labels;
+    }
+
+    public void setLabels(Set<Label> labels)
+    {
+        this.labels = labels;
+        for (Label label:labels)
+        {
+            label.setBoard(this);
+        }
+    }
+
+    public Set<Card> getCards()
+    {
+        return cards;
+    }
+
+    public void setCards(Set<Card> cards)
+    {
+        this.cards = cards;
+        for (Card card:cards)
+        {
+            card.setBoard(this);
+        }
+    }
+
+    public Set<List> getLists()
+    {
+        return lists;
+    }
+
+    public void setLists(Set<List> lists)
+    {
+        this.lists = lists;
+        for (List list:lists)
+        {
+            list.setBoard(this);
+        }
     }
 }
