@@ -1,28 +1,33 @@
 package com.spmd.trello.controller;
 
+import com.spmd.trello.BadConfig;
 import com.spmd.trello.model.Action;
+import com.spmd.trello.model.Board;
 import com.spmd.trello.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 
 //TBD, currently stock placeholder from springboot tutorial until i get the entities right
 @RestController
+@CrossOrigin(origins = {"http://localhost:3002", BadConfig.FRONTEND_URL})
 class ActionController
 {
     @Autowired
     private final ActionRepository repository;
+    @Autowired
+    private final BoardRepository boardRepository;
 
-    ActionController(ActionRepository repository)
+    ActionController(ActionRepository repository, BoardRepository boardRepository)
     {
         this.repository = repository;
+        this.boardRepository = boardRepository;
     }
 
     @GetMapping(path = "/actions")
-    Iterable<Action> all() {
-        return repository.findAll();
+    Iterable<Action> all(@RequestParam String boardId) {
+        Board board = boardRepository.findById(boardId).orElseThrow();
+        return board.getActions();
     }
 
     @PostMapping("/action")
