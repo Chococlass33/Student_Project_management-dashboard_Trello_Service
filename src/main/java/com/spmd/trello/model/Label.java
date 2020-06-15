@@ -1,10 +1,9 @@
 package com.spmd.trello.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 public class Label
@@ -12,20 +11,28 @@ public class Label
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     private String id;
-    private String idBoard;
+    @ManyToOne
+    @JoinColumn(name = "idBoard",nullable = false)
+    private Board board;
     private String name;
     private String colour;
     private Timestamp dateCreated;
     private Timestamp dateLastModified;
 
+    @OneToMany(
+            mappedBy = "label",
+            cascade=CascadeType.ALL
+    )
+    private Set<CardLabel> cardLabels;
+
     public Label(String id, String idBoard, String name, String colour, Timestamp dateCreated, Timestamp dateLastModified)
     {
         this.id = id;
-        this.idBoard = idBoard;
         this.name = name;
         this.colour = colour;
         this.dateCreated = dateCreated;
         this.dateLastModified = dateLastModified;
+        cardLabels = new HashSet<>();
     }
 
     protected Label(){}
@@ -38,16 +45,6 @@ public class Label
     public void setId(String id)
     {
         this.id = id;
-    }
-
-    public String getIdBoard()
-    {
-        return idBoard;
-    }
-
-    public void setIdBoard(String idBoard)
-    {
-        this.idBoard = idBoard;
     }
 
     public String getName()
@@ -88,5 +85,29 @@ public class Label
     public void setDateLastModified(Timestamp dateLastModified)
     {
         this.dateLastModified = dateLastModified;
+    }
+
+    public Set<CardLabel> getCardLabels()
+    {
+        return cardLabels;
+    }
+
+    public void setCardLabels(Set<CardLabel> cardLabels)
+    {
+        this.cardLabels = cardLabels;
+        for (CardLabel cardLabel:cardLabels)
+        {
+            cardLabel.setLabel(this);
+        }
+    }
+
+    public Board getBoard()
+    {
+        return board;
+    }
+
+    public void setBoard(Board board)
+    {
+        this.board = board;
     }
 }

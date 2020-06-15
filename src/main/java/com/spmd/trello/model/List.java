@@ -1,10 +1,9 @@
 package com.spmd.trello.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 public class List
@@ -12,20 +11,29 @@ public class List
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     private String id;
-    private String idBoard;
+    @ManyToOne
+    @JoinColumn(name = "idBoard",nullable = false)
+    private Board board;
     private String name;
     private Float pos;
     private Timestamp dateCreated;
     private Timestamp dateLastModified;
 
+    @OneToMany(
+            mappedBy = "list",
+            cascade=CascadeType.ALL
+    )
+    private Set<Card> cards;
+
+
     public List(String id, String idBoard, String name, Float pos, Timestamp dateCreated, Timestamp dateLastModified)
     {
         this.id = id;
-        this.idBoard = idBoard;
         this.name = name;
         this.pos = pos;
         this.dateCreated = dateCreated;
         this.dateLastModified = dateLastModified;
+        cards = new HashSet<>();
     }
 
     public String getId()
@@ -36,16 +44,6 @@ public class List
     public void setId(String id)
     {
         this.id = id;
-    }
-
-    public String getIdBoard()
-    {
-        return idBoard;
-    }
-
-    public void setIdBoard(String idBoard)
-    {
-        this.idBoard = idBoard;
     }
 
     public String getName()
@@ -86,5 +84,29 @@ public class List
     public void setDateLastModified(Timestamp dateLastModified)
     {
         this.dateLastModified = dateLastModified;
+    }
+
+    public Board getBoard()
+    {
+        return board;
+    }
+
+    public void setBoard(Board board)
+    {
+        this.board = board;
+    }
+
+    public Set<Card> getCards()
+    {
+        return cards;
+    }
+
+    public void setCards(Set<Card> cards)
+    {
+        this.cards = cards;
+        for (Card card:cards)
+        {
+            card.setList(this);
+        }
     }
 }
