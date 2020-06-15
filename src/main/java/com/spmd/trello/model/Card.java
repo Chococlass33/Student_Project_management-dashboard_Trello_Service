@@ -20,7 +20,7 @@ public class Card
     private String checkItemStates;
     private int closed;
     private Timestamp dateLastActivity;
-    private String desc;
+    private String description;
     private String descData;
     private Timestamp due;
     private int dueComplete;
@@ -48,13 +48,13 @@ public class Card
     )
     private Set<Checklist> checklists;
 
-    public Card(String id, String idList, String idBoard, String checkItemStates, int closed, Timestamp dateLastActivity, String desc, String descData, Timestamp due, int dueComplete, String name, Float pos, String shortLink, Timestamp dateCreated, Timestamp dateLastModified)
+    public Card(String id, String idList, String idBoard, String checkItemStates, int closed, Timestamp dateLastActivity, String description, String descData, Timestamp due, int dueComplete, String name, Float pos, String shortLink, Timestamp dateCreated, Timestamp dateLastModified)
     {
         this.id = id;
         this.checkItemStates = checkItemStates;
         this.closed = closed;
         this.dateLastActivity = dateLastActivity;
-        this.desc = desc;
+        this.description = description;
         this.descData = descData;
         this.due = due;
         this.dueComplete = dueComplete;
@@ -110,14 +110,14 @@ public class Card
         this.dateLastActivity = dateLastActivity;
     }
 
-    public String getDesc()
+    public String getDescription()
     {
-        return desc;
+        return description;
     }
 
-    public void setDesc(String desc)
+    public void setDescription(String description)
     {
-        this.desc = desc;
+        this.description = description;
     }
 
     public String getDescData()

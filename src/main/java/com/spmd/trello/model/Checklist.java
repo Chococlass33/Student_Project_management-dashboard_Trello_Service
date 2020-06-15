@@ -20,7 +20,7 @@ public class Checklist
     private Timestamp dateLastModified;
 
     @OneToMany(
-            mappedBy = "checklist",
+            mappedBy = "checkList",
             cascade=CascadeType.ALL
     )
     private Set<CheckItem> checkItems;

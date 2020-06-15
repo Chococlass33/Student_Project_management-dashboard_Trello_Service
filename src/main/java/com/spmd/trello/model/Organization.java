@@ -13,7 +13,7 @@ public class Organization
     private String id;
     private String name;
     private String displayName;
-    private String desc;
+    private String description;
     private String descData;
     private String teamType;
     private Timestamp dateCreated;
@@ -31,13 +31,13 @@ public class Organization
     )
     private Set<Board> boards;
 
-    public Organization(String id, String name, String displayName, String desc, String descData, String teamType, Timestamp dateCreated, Timestamp dateLastModified)
+    public Organization(String id, String name, String displayName, String description, String descData, String teamType, Timestamp dateCreated, Timestamp dateLastModified)
     {
 
         this.id = id;
         this.name = name;
         this.displayName = displayName;
-        this.desc = desc;
+        this.description = description;
         this.descData = descData;
         this.teamType = teamType;
         this.dateCreated = dateCreated;
@@ -78,14 +78,14 @@ public class Organization
         this.displayName = displayName;
     }
 
-    public String getDesc()
+    public String getDescription()
     {
-        return desc;
+        return description;
     }
 
-    public void setDesc(String desc)
+    public void setDescription(String description)
     {
-        this.desc = desc;
+        this.description = description;
     }
 
     public String getDescData()

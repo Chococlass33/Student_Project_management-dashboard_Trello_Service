@@ -1,5 +1,8 @@
 package com.spmd.trello.model;
 
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.GenericGenerator;
+
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.HashSet;
@@ -9,7 +12,8 @@ import java.util.Set;
 public class Member
 {
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+//    @GeneratedValue(generator="system-uuid")
+//    @GenericGenerator(name="system-uuid", strategy = "uuid")
     private String id;
     private String memberType;
     private String fullName;

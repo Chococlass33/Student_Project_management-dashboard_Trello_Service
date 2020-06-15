@@ -15,7 +15,7 @@ public class Board
     @JoinColumn(name = "idOrganisation",nullable = false)
     private Organization organisation;
     private String name;
-    private String desc;
+    private String description;
     private String descData;
     private String shortLink;
     private Timestamp dateCreated;
@@ -45,11 +45,11 @@ public class Board
     )
     private Set<List> lists;
 
-    public Board(String id, String name, String desc, String descData, String shortLink, Timestamp dateCreated, Timestamp dateLastModified)
+    public Board(String id, String name, String description, String descData, String shortLink, Timestamp dateCreated, Timestamp dateLastModified)
     {
         this.id = id;
         this.name = name;
-        this.desc = desc;
+        this.description = description;
         this.descData = descData;
         this.shortLink = shortLink;
         this.dateCreated = dateCreated;
@@ -82,14 +82,14 @@ public class Board
         this.name = name;
     }
 
-    public String getDesc()
+    public String getDescription()
     {
-        return desc;
+        return description;
     }
 
-    public void setDesc(String desc)
+    public void setDescription(String description)
     {
-        this.desc = desc;
+        this.description = description;
     }
 
     public String getDescData()

@@ -12,7 +12,6 @@ public class CardLabel
     @ManyToOne
     @JoinColumn(name = "idCard",nullable = false)
     private Card card;
-    private String idLabel;
     @ManyToOne
     @JoinColumn(name = "idLabel",nullable = false)
     private Label label;
@@ -23,7 +22,6 @@ public class CardLabel
     {
 
         this.id = id;
-        this.idLabel = idLabel;
         this.dateCreated = dateCreated;
         this.dateLastModified = dateLastModified;
     }
@@ -40,15 +38,6 @@ public class CardLabel
         this.id = id;
     }
 
-    public String getIdLabel()
-    {
-        return idLabel;
-    }
-
-    public void setIdLabel(String idLabel)
-    {
-        this.idLabel = idLabel;
-    }
 
     public Timestamp getDateCreated()
     {

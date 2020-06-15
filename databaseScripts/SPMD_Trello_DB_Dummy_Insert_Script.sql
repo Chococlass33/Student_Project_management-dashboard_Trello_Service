@@ -25,7 +25,7 @@ INSERT INTO `spmd-trello`.`organization`
 (`id`,
 `name`,
 `displayName`,
-`desc`,
+`description`,
 `teamType`)
 VALUES
 ('1',
@@ -90,7 +90,7 @@ INSERT INTO `spmd-trello`.`board`
 (`id`,
 `idOrganization`,
 `name`,
-`desc`,
+`description`,
 `shortLink`)
 VALUES
 ('1',
@@ -139,7 +139,7 @@ INSERT INTO `spmd-trello`.`card`
 `checkItemStates`,
 `closed`,
 `dateLastActivity`,
-`desc`,
+`description`,
 `descData`,
 `due`,
 `dueCompleted`,
