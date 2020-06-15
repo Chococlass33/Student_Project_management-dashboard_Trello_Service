@@ -4,6 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class NewWebhook {
-    public String modelId;
+    public String idModel;
     public String token;
 }
