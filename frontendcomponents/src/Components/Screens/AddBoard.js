@@ -1,9 +1,10 @@
 import React from "react";
 import {Component} from "react/cjs/react.production.min.js";
 import queryString from 'query-string'
+import {useHistory} from 'react-router-dom';
 
 const API_KEY = "38e2c9e0bd5f083ac3e8e19ed8a1a5fa"
-const URL = "http://c8ab66035fa0.ngrok.io"
+const URL = "http://6d1815b832ac.au.ngrok.io"
 
 // const URL = "localhost:3002"
 
@@ -71,6 +72,13 @@ class AddBoard extends Component {
                                 ({this.state.chosenBoard.id})<br/>
                                 <a target="_blank" href={this.state.chosenBoard.url}>Board URL</a>
                             </p>
+                            <p>
+                                <a href={`http://localhost:3002/?projectId=${this.state.projectId}&integrationId=${this.state.chosenBoard.id}`}>View
+                                    Integration</a>
+                                <br/>
+                                <a href={`http://localhost:3000/project?project_id=${this.state.projectId}`}> Return to
+                                    add integration</a>
+                            </p>
                         </div>
                     )
                 } else if (this.state.webhookError) {
@@ -125,6 +133,7 @@ class AddBoard extends Component {
 
     }
 
+
     /**
      * Generates the url to obtain authentication from trello
      * @param projId The id of the project
@@ -161,7 +170,7 @@ class AddBoard extends Component {
         }
         fetch("http://localhost:5002/webhook/new", request)
             .then((result) => {
-                if (result.ok){
+                if (result.ok) {
                     console.log("Request Succeeded: " + result)
                     this.setState((state, props) => {
                         return {
@@ -175,9 +184,9 @@ class AddBoard extends Component {
                     result.text()
                         .then(JSON.parse)
                         .then(result => {
-                        console.log(result.message)
-                        this.requestFailed(result.message)
-                    })
+                            console.log(result.message)
+                            this.requestFailed(result.message)
+                        })
                 }
             }, this.requestFailed.bind(this))
     }
