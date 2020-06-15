@@ -12,7 +12,7 @@ public class Board
     @GeneratedValue(strategy=GenerationType.AUTO)
     private String id;
     @ManyToOne
-    @JoinColumn(name = "idOrganisation",nullable = false)
+    @JoinColumn(name = "idOrganization",nullable = false)
     private Organization organisation;
     private String name;
     private String description;

@@ -20,13 +20,13 @@ public class Organization
     private Timestamp dateLastModified;
 
     @OneToMany(
-            mappedBy = "organisation",
+            mappedBy = "organization",
             cascade=CascadeType.ALL
     )
     private Set<OrganizationMember> organisationMembers;
 
     @OneToMany(
-            mappedBy = "organisation",
+            mappedBy = "organization",
             cascade=CascadeType.ALL
     )
     private Set<Board> boards;
@@ -138,7 +138,7 @@ public class Organization
         this.organisationMembers = organizationMembers;
         for(OrganizationMember organizationMember:organizationMembers)
         {
-            organizationMember.setOrganisation(this);
+            organizationMember.setOrganization(this);
         }
     }
 
