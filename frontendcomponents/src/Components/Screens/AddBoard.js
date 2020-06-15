@@ -3,7 +3,7 @@ import {Component} from "react/cjs/react.production.min.js";
 import queryString from 'query-string'
 
 const API_KEY = "38e2c9e0bd5f083ac3e8e19ed8a1a5fa"
-const URL = "http://15ce3c0f222c.ngrok.io"
+const URL = "http://c8ab66035fa0.ngrok.io"
 
 // const URL = "localhost:3002"
 
@@ -14,7 +14,10 @@ class AddBoard extends Component {
         this.state = {
             token: this.props.location.hash ? queryString.parse(this.props.location.hash).token : undefined,
             projectId: undefined,
-            boards: undefined
+            boards: undefined,
+            hasWebhook: false,
+            webhookError: undefined,
+            chosenBoard: undefined
         };
         if (this.props.location.state) {
             this.state.projectId = this.props.location.state.projectId
@@ -25,14 +28,14 @@ class AddBoard extends Component {
     }
 
     componentDidMount() {
-        if (this.state.token) {
+        if (this.state.token && !this.state.boards) {
             console.log("Fetching Boards")
             fetch(`https://api.trello.com/1/members/me/boards?fields=name,url&key=${API_KEY}&token=${this.state.token}`)
                 .then(res => res.json())
                 .then((result) => {
                         console.log("done")
                         this.setState((state, props) => {
-                            return  {
+                            return {
                                 ...state,
                                 boards: result
                             };
@@ -55,16 +58,43 @@ class AddBoard extends Component {
                 const boards = this.state.boards.map((board, i) =>
                     (<div>
                         Board: {board.name}<br/>
-                        <a target="_blank"  href={board.url}>Board URL</a>
-                        <button onClick={this.useBoard.bind(this, board)}>Use Board</button>
+                        <a target="_blank" href={board.url}>Board URL</a>
+                        <button onClick={this.useBoard.bind(this, board, this.state.token)}>Use Board</button>
                     </div>)
                 );
-                return (
-                    <div>
-                        <h1 style={{marginTop: "64px"}}>Add Board</h1>
-                        <tbody>{boards}</tbody>
-                    </div>
-                )
+                if (this.state.hasWebhook) {
+                    return (
+                        <div>
+                            <h1 style={{marginTop: "64px"}}>Add Board</h1>
+                            <p>
+                                Board webhook made for board "{this.state.chosenBoard.name}"
+                                ({this.state.chosenBoard.id})<br/>
+                                <a target="_blank" href={this.state.chosenBoard.url}>Board URL</a>
+                            </p>
+                        </div>
+                    )
+                } else if (this.state.webhookError) {
+                    return (
+                        <div>
+                            <h1 style={{marginTop: "64px"}}>Add Board</h1>
+                            <p>
+                                Unable to create webhook for selected board.<br/>
+                                Please try again, choose a different board, or return to the choose integration page.
+
+                                Error: "{this.state.webhookError}"
+                            </p>
+                            <tbody>{boards}</tbody>
+                        </div>
+                    )
+                } else {
+                    return (
+                        <div>
+                            <h1 style={{marginTop: "64px"}}>Add Board</h1>
+                            <tbody>{boards}</tbody>
+                        </div>
+                    )
+                }
+
             } else {
                 return (
                     <div>
@@ -95,6 +125,11 @@ class AddBoard extends Component {
 
     }
 
+    /**
+     * Generates the url to obtain authentication from trello
+     * @param projId The id of the project
+     * @returns {string} The URL to redirect to
+     */
     generateAuthString(projId) {
         return "https://trello.com/1/authorize?" +
             "expiration=never" +
@@ -106,8 +141,56 @@ class AddBoard extends Component {
             `&key=${API_KEY}`
     }
 
-    useBoard(board) {
+    /**
+     * Contacts the backend API service to setup tracking for the board
+     * @param board The information of the board to track
+     * @param token The trello auth token to use
+     */
+    useBoard(board, token) {
         console.log(board)
+        const webhookBody = {
+            idModel: board.id,
+            token: token
+        }
+        const request = {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(webhookBody)
+        }
+        fetch("http://localhost:5002/webhook/new", request)
+            .then((result) => {
+                if (result.ok){
+                    console.log("Request Succeeded: " + result)
+                    this.setState((state, props) => {
+                        return {
+                            ...state,
+                            hasWebhook: true,
+                            webhookError: undefined,
+                            chosenBoard: board
+                        };
+                    })
+                } else {
+                    result.text()
+                        .then(JSON.parse)
+                        .then(result => {
+                        console.log(result.message)
+                        this.requestFailed(result.message)
+                    })
+                }
+            }, this.requestFailed.bind(this))
+    }
+
+    requestFailed(error) {
+        console.log("Request failed: " + error)
+        this.setState((state, props) => {
+            return {
+                ...state,
+                hasWebhook: false,
+                webhookError: error
+            };
+        })
     }
 }
 
