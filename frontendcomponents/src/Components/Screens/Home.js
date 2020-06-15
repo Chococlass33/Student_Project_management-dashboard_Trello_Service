@@ -19,8 +19,15 @@ function Home(props) {
         return (
             <div>
                 <h1 style={{marginTop: "64px"}}>Home Page</h1>
-                <p>Project ID: {values.projectId}</p>
-                <p>Integration ID: {values.integrationId}</p>
+                <p>
+                    Project ID: {values.projectId}<br/>
+                    Integration ID: {values.integrationId}
+                </p>
+                <p>
+                    <a href={`http://localhost:3002/Actions?=integrationId=${values.integrationId}`}>View Actions</a><br/>  
+                    <a href={`http://localhost:3002/Board?=integrationId=${values.integrationId}`}>View Board</a>
+                </p>
+
             </div>
         );
     } else {
