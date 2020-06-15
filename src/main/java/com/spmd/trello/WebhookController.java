@@ -1,10 +1,29 @@
 package com.spmd.trello;
 
 import com.spmd.trello.model.Action;
+import com.spmd.trello.model.Board;
+import com.spmd.trello.model.BoardMembership;
+import com.spmd.trello.model.Card;
+import com.spmd.trello.model.CardLabel;
+import com.spmd.trello.model.CardMember;
+import com.spmd.trello.model.CheckItem;
+import com.spmd.trello.model.Checklist;
+import com.spmd.trello.model.Label;
+import com.spmd.trello.model.List;
 import com.spmd.trello.model.Member;
 import com.spmd.trello.repositories.ActionRepository;
+import com.spmd.trello.repositories.BoardMembershipRepository;
+import com.spmd.trello.repositories.BoardRepository;
+import com.spmd.trello.repositories.CardLabelRepository;
+import com.spmd.trello.repositories.CardMemberRepository;
+import com.spmd.trello.repositories.CardRepository;
+import com.spmd.trello.repositories.CheckItemRepository;
+import com.spmd.trello.repositories.ChecklistRepository;
+import com.spmd.trello.repositories.LabelRepository;
+import com.spmd.trello.repositories.ListRepository;
 import com.spmd.trello.repositories.MemberRepository;
 import com.spmd.trello.trelloModel.NewWebhook;
+import com.spmd.trello.trelloModel.TrelloBoard;
 import com.spmd.trello.trelloModel.WebhookAction;
 import com.spmd.trello.trelloModel.WebhookPost;
 import com.spmd.trello.trelloModel.WebhookResponse;
@@ -35,16 +54,34 @@ import java.util.Set;
  */
 @Controller // This means that this class is a Controller
 @RequestMapping(path = "/webhook") // This means URL's start with /demo (after Application path)
-@CrossOrigin(origins = {"http://localhost:3002","http://c8ab66035fa0.ngrok.io"})
+@CrossOrigin(origins = {"http://localhost:3002", "http://6d1815b832ac.au.ngrok.io"})
 public class WebhookController {
     private static final Logger logger = LoggerFactory.getLogger(WebhookController.class);
     @Autowired
     private MemberRepository memberRepository;
     @Autowired
     private ActionRepository actionRepository;
+    @Autowired
+    private BoardRepository boardRepository;
+    @Autowired
+    private CardRepository cardRepository;
+    @Autowired
+    private ListRepository listRepository;
+    @Autowired
+    private LabelRepository labelRepository;
+    @Autowired
+    private CardLabelRepository cardLabelRepository;
+    @Autowired
+    private BoardMembershipRepository boardMembershipRepository;
+    @Autowired
+    private ChecklistRepository checklistRepository;
+    @Autowired
+    private CheckItemRepository checkItemRepository;
+    @Autowired
+    private CardMemberRepository cardMemberRepository;
 
     private static final String API_KEY = "38e2c9e0bd5f083ac3e8e19ed8a1a5fa";
-    private static final String CALLBACK_URL = "http://3cdaf411f427.ngrok.io/webhook";
+    private static final String CALLBACK_URL = "http://88b41a9ccd38.au.ngrok.io/webhook";
 
     /**
      * Handles the initial HEAD request from trello to check if the webhook is active
@@ -80,8 +117,6 @@ public class WebhookController {
             WebhookResponse response = restTemplate.postForObject(url, webhook, WebhookResponse.class);
             logger.info("Made Webhook");
             logger.info(response.toString());
-
-            return "New webhook created";
         } catch (HttpClientErrorException e) {
             logger.error("Unable to make webhook");
             logger.error(e.getMessage());
@@ -89,6 +124,16 @@ public class WebhookController {
                     HttpStatus.BAD_REQUEST, e.getMessage());
         }
 
+        try {
+            scrapeBoard(body.idModel, body.token);
+        } catch (HttpClientErrorException e) {
+            logger.error("Unable to scrape board data");
+            logger.error(e.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+
+        return "Webhook created & Board Scraped";
     }
 
     /**
@@ -163,5 +208,179 @@ public class WebhookController {
                 Timestamp.from(Instant.now()));
         memberRepository.save(member);
         return member;
+    }
+
+    /**
+     * Scrapes the whole board into the database
+     *
+     * @param boardId The id of the board to use
+     */
+    private void scrapeBoard(String boardId, String token) {
+
+        URI url = UriComponentsBuilder.fromHttpUrl("https://api.trello.com/1/boards/")
+                .path(boardId)
+                .queryParam("key", API_KEY)
+                .queryParam("token", token)
+                .queryParam("cards", "all")
+                .queryParam("labels", "all")
+                .queryParam("members", "all")
+                .queryParam("checklists", "all")
+                .queryParam("lists", "all")
+                .build().toUri();
+
+        RestTemplate restTemplate = new RestTemplate();
+        TrelloBoard board = restTemplate.getForObject(url, TrelloBoard.class);
+        saveBoardToDatabase(board);
+    }
+
+    /**
+     * Saves the given board to the database.
+     * Converts each of the json representations into database representations.
+     * Order is important as it ensures that the relations can be constructed correctly
+     *
+     * @param board The board data to save to the database
+     */
+    private void saveBoardToDatabase(TrelloBoard board) {
+        Board dbBoard = convertBoard(board);
+        boardRepository.save(dbBoard);
+
+        board.lists.stream()
+                .map(this::convertList)
+                .forEach(listRepository::save);
+
+        board.cards.stream()
+                .map(this::convertCard)
+                .forEach(cardRepository::save);
+
+        board.labels.stream()
+                .map(this::convertLabel)
+                .forEach(labelRepository::save);
+
+        board.cards.stream()
+                .flatMap(card -> card.idLabels
+                        .stream()
+                        .map(idLabel -> createCardLabel(card.id, idLabel)))
+                .forEach(cardLabelRepository::save);
+
+        board.members.stream()
+                .map(this::convertMember)
+                .forEach(memberRepository::save);
+
+        board.members.stream()
+                .map(member -> createBoardMembership(board.id, member.id))
+                .forEach(boardMembershipRepository::save);
+
+        board.cards.stream()
+                .flatMap(card -> card.idMembers.stream().map(idMember -> createCardMember(card.id, idMember)))
+                .forEach(cardMemberRepository::save);
+
+        board.checklists.stream()
+                .map(this::convertChecklist)
+                .forEach(checklistRepository::save);
+
+        board.checklists.stream()
+                .flatMap(checklist -> checklist.checkItems.stream().map(this::convertCheckItem))
+                .forEach(checkItemRepository::save);
+    }
+
+    private Board convertBoard(TrelloBoard board) {
+        return new Board(board.id,
+                board.name,
+                board.desc,
+                board.descData.map(Object::toString).orElse(null),
+                board.shortUrl,
+                Timestamp.from(Instant.now()),
+                Timestamp.from(Instant.now()));
+    }
+
+    private List convertList(TrelloBoard.TrelloList list) {
+        return new List(list.id,
+                boardRepository.findById(list.idBoard).orElseThrow(),
+                list.name,
+                list.pos,
+                Timestamp.from(Instant.now()),
+                Timestamp.from(Instant.now()));
+    }
+
+    private Card convertCard(TrelloBoard.Card card) {
+        return new Card(card.id,
+                listRepository.findById(card.idList).orElseThrow(),
+                boardRepository.findById(card.idBoard).orElseThrow(),
+                card.checkItemStates.map(Object::toString).orElse(null), //TODO: Check this
+                card.closed ? 0 : 1,
+                Timestamp.from(Instant.parse(card.dateLastActivity)),
+                card.desc,
+                card.descData.map(Object::toString).orElse(null),
+                card.due.map(due -> Timestamp.from(Instant.parse(due))).orElse(null),
+                0,
+                card.name,
+                card.pos,
+                card.shortUrl,
+                Timestamp.from(Instant.now()),
+                Timestamp.from(Instant.now()));
+    }
+
+    private Label convertLabel(TrelloBoard.Label label) {
+        return new Label(label.id,
+                boardRepository.findById(label.idBoard).orElseThrow(),
+                label.name,
+                label.color,
+                Timestamp.from(Instant.now()),
+                Timestamp.from(Instant.now()));
+    }
+
+    private CardLabel createCardLabel(String cardId, String labelId) {
+        return new CardLabel(
+                cardRepository.findById(cardId).orElseThrow(),
+                labelRepository.findById(labelId).orElseThrow(),
+                Timestamp.from(Instant.now()),
+                Timestamp.from(Instant.now()));
+    }
+
+    private Member convertMember(TrelloBoard.Member member) {
+        return new Member(member.id,
+                member.memberType,
+                member.fullName,
+                member.email,
+                Timestamp.from(Instant.now()),
+                Timestamp.from(Instant.now()));
+    }
+
+    private BoardMembership createBoardMembership(String boardId, String memberId) {
+        return new BoardMembership(
+                boardRepository.findById(boardId).orElseThrow(),
+                memberRepository.findById(memberId).orElseThrow(),
+                null,
+                Timestamp.from(Instant.now()),
+                Timestamp.from(Instant.now()));
+    }
+
+    private CardMember createCardMember(String cardId, String memberId) {
+        return new CardMember(
+                cardRepository.findById(cardId).orElseThrow(),
+                memberRepository.findById(memberId).orElseThrow(),
+                Timestamp.from(Instant.now()),
+                Timestamp.from(Instant.now()));
+
+    }
+
+    private Checklist convertChecklist(TrelloBoard.Checklist checklist) {
+        return new Checklist(checklist.id,
+                cardRepository.findById(checklist.idCard).orElseThrow(),
+                checklist.name,
+                checklist.pos,
+                Timestamp.from(Instant.now()),
+                Timestamp.from(Instant.now()));
+    }
+
+    private CheckItem convertCheckItem(TrelloBoard.Checklist.CheckItem checkItem) {
+        return new CheckItem(checkItem.id,
+                checklistRepository.findById(checkItem.idChecklist).orElseThrow(),
+                checkItem.name,
+                checkItem.nameData.map(Object::toString).orElse(null),
+                checkItem.pos,
+                checkItem.state,
+                Timestamp.from(Instant.now()),
+                Timestamp.from(Instant.now()));
     }
 }
