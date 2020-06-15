@@ -13,7 +13,7 @@ public class Board
     private String id;
     @ManyToOne
     @JoinColumn(name = "idOrganization",nullable = false)
-    private Organization organisation;
+    private Organization organization;
     private String name;
     private String description;
     private String descData;
@@ -132,14 +132,14 @@ public class Board
         this.dateLastModified = dateLastModified;
     }
 
-    public Organization getOrganisation()
+    public Organization getOrganization()
     {
-        return organisation;
+        return organization;
     }
 
-    public void setOrganisation(Organization organisation)
+    public void setOrganization(Organization organization)
     {
-        this.organisation = organisation;
+        this.organization = organization;
     }
 
     public Set<BoardMembership> getBoardMemberships()

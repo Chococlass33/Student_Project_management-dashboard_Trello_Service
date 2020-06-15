@@ -23,7 +23,7 @@ public class Organization
             mappedBy = "organization",
             cascade=CascadeType.ALL
     )
-    private Set<OrganizationMember> organisationMembers;
+    private Set<OrganizationMember> organizationMembers;
 
     @OneToMany(
             mappedBy = "organization",
@@ -42,7 +42,7 @@ public class Organization
         this.teamType = teamType;
         this.dateCreated = dateCreated;
         this.dateLastModified = dateLastModified;
-        organisationMembers = new HashSet<OrganizationMember>();
+        organizationMembers = new HashSet<OrganizationMember>();
         boards = new HashSet<Board>();
     }
     protected Organization(){}
@@ -128,14 +128,14 @@ public class Organization
         this.dateLastModified = dateLastModified;
     }
 
-    public Set<OrganizationMember> getOrganisationMember()
+    public Set<OrganizationMember> getOrganizationMember()
     {
-        return organisationMembers;
+        return organizationMembers;
     }
 
-    public void setOrganisationMember(Set<OrganizationMember> organizationMembers)
+    public void setOrganizationMember(Set<OrganizationMember> organizationMembers)
     {
-        this.organisationMembers = organizationMembers;
+        this.organizationMembers = organizationMembers;
         for(OrganizationMember organizationMember:organizationMembers)
         {
             organizationMember.setOrganization(this);
@@ -152,7 +152,7 @@ public class Organization
         this.boards = boards;
         for(Board board:boards)
         {
-            board.setOrganisation(this);
+            board.setOrganization(this);
         }
     }
 }
