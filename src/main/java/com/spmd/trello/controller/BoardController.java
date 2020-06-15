@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 //TBD, currently stock placeholder from springboot tutorial until i get the entities right
 @RestController
-@CrossOrigin(origins = {"http://localhost:3002", BadConfig.FRONTEND_URL})
 class BoardController {
     @Autowired
     private final BoardRepository repository;

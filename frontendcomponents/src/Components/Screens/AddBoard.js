@@ -1,7 +1,6 @@
 import React from "react";
 import {Component} from "react/cjs/react.production.min.js";
 import queryString from 'query-string'
-import {useHistory} from 'react-router-dom';
 
 const API_KEY = "38e2c9e0bd5f083ac3e8e19ed8a1a5fa"
 const URL = "http://6d1815b832ac.au.ngrok.io"
@@ -140,12 +139,14 @@ class AddBoard extends Component {
      * @returns {string} The URL to redirect to
      */
     generateAuthString(projId) {
+        console.log(process.env)
+        console.log(process.env.DOMAIN)
         return "https://trello.com/1/authorize?" +
             "expiration=never" +
             "&name=Student%20Project%20Management%20Dashboard" +
             "&scope=read" +
             "&callback_method=fragment" +
-            `&return_url=${URL}/addBoard?projectId=${projId}` +
+            `&return_url=${process.env.REACT_APP_DOMAIN}/addBoard?projectId=${projId}` +
             "&response_type=token" +
             `&key=${API_KEY}`
     }
