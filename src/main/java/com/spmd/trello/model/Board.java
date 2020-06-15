@@ -1,5 +1,7 @@
 package com.spmd.trello.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.HashSet;
@@ -18,30 +20,35 @@ public class Board
     private Timestamp dateCreated;
     private Timestamp dateLastModified;
 
+    @JsonIgnore
     @OneToMany(
             mappedBy = "board",
             cascade=CascadeType.ALL
     )
     private Set<BoardMembership> boardMemberships;
 
+    @JsonIgnore
     @OneToMany(
             mappedBy = "board",
             cascade=CascadeType.ALL
     )
     private Set<Label> labels;
 
+    @JsonIgnore
     @OneToMany(
             mappedBy = "board",
             cascade=CascadeType.ALL
     )
     private Set<Card> cards;
 
+    @JsonIgnore
     @OneToMany(
             mappedBy = "board",
             cascade=CascadeType.ALL
     )
     private Set<List> lists;
 
+    @JsonIgnore
     @OneToMany(
             mappedBy = "board",
             cascade = CascadeType.ALL

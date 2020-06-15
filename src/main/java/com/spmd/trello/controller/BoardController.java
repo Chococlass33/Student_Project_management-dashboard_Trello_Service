@@ -1,43 +1,47 @@
 package com.spmd.trello.controller;
 
+import com.spmd.trello.BadConfig;
 import com.spmd.trello.model.Board;
 import com.spmd.trello.repositories.BoardRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 
 //TBD, currently stock placeholder from springboot tutorial until i get the entities right
 @RestController
-class BoardController
-{
+@CrossOrigin(origins = {"http://localhost:3002", BadConfig.FRONTEND_URL})
+class BoardController {
     @Autowired
     private final BoardRepository repository;
 
-    BoardController(BoardRepository repository)
-    {
+    BoardController(BoardRepository repository) {
         this.repository = repository;
     }
 
-    @GetMapping(path = "/Boards")
+    @GetMapping(path = "/boards")
     Iterable<Board> all() {
         return repository.findAll();
     }
 
-    @PostMapping("/Board")
+    @PostMapping("/board")
     Board newBoard(@RequestBody Board newBoard) {
         return repository.save(newBoard);
     }
 
     // Single item
 
-    @GetMapping("/Board/{id}")
+    @GetMapping("/board/{id}")
     Board one(@PathVariable String id) {
-
-        return repository.findById(id)
-                .orElseThrow(() -> new RuntimeException());
+        return repository.findById(id).orElseThrow();
     }
 
-    @DeleteMapping("/Board/{id}")
+    @DeleteMapping("/board/{id}")
     void deleteBoard(@PathVariable String id) {
         repository.deleteById(id);
     }

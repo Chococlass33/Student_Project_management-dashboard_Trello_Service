@@ -24,8 +24,8 @@ function Home(props) {
                     Integration ID: {values.integrationId}
                 </p>
                 <p>
-                    <a href={`http://localhost:3002/Actions?=integrationId=${values.integrationId}`}>View Actions</a><br/>  
-                    <a href={`http://localhost:3002/Board?=integrationId=${values.integrationId}`}>View Board</a>
+                    <a href={`http://localhost:3002/Actions?integrationId=${values.integrationId}`}>View Actions</a><br/>
+                    <a href={`http://localhost:3002/Board?integrationId=${values.integrationId}`}>View Board</a>
                 </p>
 
             </div>

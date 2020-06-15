@@ -201,9 +201,9 @@ public class WebhookController {
      */
     private Member makeMember(String memberId) {
         Member member = new Member(memberId,
-                "someType",
-                "Some Name",
-                "Some Email",
+                "Fake Type",
+                "Fake Name",
+                "Fake Email",
                 Timestamp.from(Instant.now()),
                 Timestamp.from(Instant.now()));
         memberRepository.save(member);

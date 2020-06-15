@@ -1,5 +1,8 @@
 package com.spmd.trello.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -16,9 +19,11 @@ public class Card {
     @Id
 //    @GeneratedValue(strategy=GenerationType.AUTO)
     private String id;
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "idList", nullable = false)
     private List list;
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "idBoard", nullable = false)
     private Board board;
@@ -37,18 +42,21 @@ public class Card {
     private Timestamp dateCreated;
     private Timestamp dateLastModified;
 
+    @JsonIgnore
     @OneToMany(
             mappedBy = "card",
             cascade = CascadeType.ALL
     )
     private Set<CardMember> cardMembers;
 
+    @JsonIgnore
     @OneToMany(
             mappedBy = "card",
             cascade = CascadeType.ALL
     )
     private Set<CardLabel> cardLabels;
 
+    @JsonIgnore
     @OneToMany(
             mappedBy = "card",
             cascade = CascadeType.ALL
@@ -246,5 +254,10 @@ public class Card {
 
     public void setList(List list) {
         this.list = list;
+    }
+
+    @JsonProperty
+    public String getListId() {
+        return list.getId();
     }
 }

@@ -2,8 +2,6 @@ import React from "react";
 import {Component} from "react/cjs/react.production.min.js";
 import queryString from 'query-string'
 
-const JSON5 = require('json5')
-
 class Actions extends Component {
     constructor(props) {
         super(props);
@@ -20,7 +18,7 @@ class Actions extends Component {
                 return actions
             })
             .then(actions => actions.map(action => {
-                action.data = JSON5.parse(action.data) // We need to use this because our json isn't "Strict"
+                action.data = JSON.parse(action.data) // We need to use this because our json isn't "Strict"
                 return action
             }))
             .then(actions => actions.map(action => (

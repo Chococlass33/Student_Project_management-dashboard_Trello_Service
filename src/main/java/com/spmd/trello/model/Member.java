@@ -1,5 +1,6 @@
 package com.spmd.trello.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -22,18 +23,21 @@ public class Member
     private Timestamp dateLastModified;
 
 
+    @JsonIgnore
     @OneToMany(
             mappedBy = "member",
             cascade=CascadeType.ALL
     )
     private Set<Action> actions;
 
+    @JsonIgnore
     @OneToMany(
             mappedBy = "member",
             cascade=CascadeType.ALL
     )
     private Set<CardMember> cardMembers;
 
+    @JsonIgnore
     @OneToMany(
             mappedBy = "member",
             cascade=CascadeType.ALL
