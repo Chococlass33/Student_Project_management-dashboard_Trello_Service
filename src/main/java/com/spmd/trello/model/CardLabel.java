@@ -8,7 +8,7 @@ public class CardLabel
 {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
-    private String id;
+    private int id;
     @ManyToOne
     @JoinColumn(name = "idCard",nullable = false)
     private Card card;
@@ -18,22 +18,22 @@ public class CardLabel
     private Timestamp dateCreated;
     private Timestamp dateLastModified;
 
-    public CardLabel(String id, String idCard, String idLabel, Timestamp dateCreated, Timestamp dateLastModified)
+    public CardLabel(Card card, Label label, Timestamp dateCreated, Timestamp dateLastModified)
     {
-
-        this.id = id;
+        this.card = card;
+        this.label = label;
         this.dateCreated = dateCreated;
         this.dateLastModified = dateLastModified;
     }
 
     protected CardLabel(){}
 
-    public String getId()
+    public int getId()
     {
         return id;
     }
 
-    public void setId(String id)
+    public void setId(int id)
     {
         this.id = id;
     }

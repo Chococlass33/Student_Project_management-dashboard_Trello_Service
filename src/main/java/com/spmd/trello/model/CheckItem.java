@@ -7,7 +7,7 @@ import java.sql.Timestamp;
 public class CheckItem
 {
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+//    @GeneratedValue(strategy=GenerationType.AUTO)
     private String id;
     @ManyToOne
     @JoinColumn(name = "idCheckList",nullable = false)
@@ -19,8 +19,11 @@ public class CheckItem
     private Timestamp dateCreated;
     private Timestamp dateLastModified;
 
-    public CheckItem(String id, String idCheckList, String name, String nameData, Float pos, String state, Timestamp dateCreated, Timestamp dateLastModified)
+    protected CheckItem(){}
+
+    public CheckItem(String id, Checklist checklist, String name, String nameData, Float pos, String state, Timestamp dateCreated, Timestamp dateLastModified)
     {
+        this.checkList = checklist;
         this.id = id;
         this.name = name;
         this.nameData = nameData;

@@ -32,12 +32,6 @@ public class Member
             mappedBy = "member",
             cascade=CascadeType.ALL
     )
-    private Set<OrganizationMember> organizationMembers;
-
-    @OneToMany(
-            mappedBy = "member",
-            cascade=CascadeType.ALL
-    )
     private Set<CardMember> cardMembers;
 
     @OneToMany(
@@ -49,7 +43,6 @@ public class Member
     protected Member()
     {
         actions = new HashSet<>();
-        organizationMembers = new HashSet<>();
         cardMembers = new HashSet<>();
         boardMemberships = new HashSet<>();
     }
@@ -63,7 +56,6 @@ public class Member
         this.dateCreated = dateCreated;
         this.dateLastModified = dateLastModified;
         actions = new HashSet<>();
-        organizationMembers = new HashSet<>();
         cardMembers = new HashSet<>();
         boardMemberships = new HashSet<>();
     }
@@ -139,20 +131,6 @@ public class Member
         for (Action action:actions)
         {
             action.setMember(this);
-        }
-    }
-
-    public Set<OrganizationMember> getOrganizationMembers()
-    {
-        return organizationMembers;
-    }
-
-    public void setOrganizationMembers(Set<OrganizationMember> organizationMembers)
-    {
-        this.organizationMembers = organizationMembers;
-        for (OrganizationMember organizationMember:organizationMembers)
-        {
-            organizationMember.setMember(this);
         }
     }
 

@@ -1,18 +1,24 @@
 package com.spmd.trello.model;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-public class Label
-{
+public class Label {
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+//    @GeneratedValue(strategy = GenerationType.AUTO)
     private String id;
     @ManyToOne
-    @JoinColumn(name = "idBoard",nullable = false)
+    @JoinColumn(name = "idBoard", nullable = false)
     private Board board;
     private String name;
     private String colour;
@@ -21,12 +27,12 @@ public class Label
 
     @OneToMany(
             mappedBy = "label",
-            cascade=CascadeType.ALL
+            cascade = CascadeType.ALL
     )
     private Set<CardLabel> cardLabels;
 
-    public Label(String id, String idBoard, String name, String colour, Timestamp dateCreated, Timestamp dateLastModified)
-    {
+    public Label(String id, Board board, String name, String colour, Timestamp dateCreated, Timestamp dateLastModified) {
+        this.board = board;
         this.id = id;
         this.name = name;
         this.colour = colour;
@@ -35,79 +41,65 @@ public class Label
         cardLabels = new HashSet<>();
     }
 
-    protected Label(){}
+    protected Label() {
+    }
 
-    public String getId()
-    {
+    public String getId() {
         return id;
     }
 
-    public void setId(String id)
-    {
+    public void setId(String id) {
         this.id = id;
     }
 
-    public String getName()
-    {
+    public String getName() {
         return name;
     }
 
-    public void setName(String name)
-    {
+    public void setName(String name) {
         this.name = name;
     }
 
-    public String getColour()
-    {
+    public String getColour() {
         return colour;
     }
 
-    public void setColour(String colour)
-    {
+    public void setColour(String colour) {
         this.colour = colour;
     }
 
-    public Timestamp getDateCreated()
-    {
+    public Timestamp getDateCreated() {
         return dateCreated;
     }
 
-    public void setDateCreated(Timestamp dateCreated)
-    {
+    public void setDateCreated(Timestamp dateCreated) {
         this.dateCreated = dateCreated;
     }
 
-    public Timestamp getDateLastModified()
-    {
+    public Timestamp getDateLastModified() {
         return dateLastModified;
     }
 
-    public void setDateLastModified(Timestamp dateLastModified)
-    {
+    public void setDateLastModified(Timestamp dateLastModified) {
         this.dateLastModified = dateLastModified;
     }
 
-    public Set<CardLabel> getCardLabels()
-    {
+    public Set<CardLabel> getCardLabels() {
         return cardLabels;
     }
 
-    public void setCardLabels(Set<CardLabel> cardLabels)
-    {
+    public void setCardLabels(Set<CardLabel> cardLabels) {
         this.cardLabels = cardLabels;
-        for (CardLabel cardLabel:cardLabels)
-        {
+        for (CardLabel cardLabel : cardLabels) {
             cardLabel.setLabel(this);
         }
     }
 
-    public Board getBoard()
-    {
+    public Board getBoard() {
         return board;
     }
 
-    public void setBoard(Board board)
-    {
+    public void setBoard(Board board) {
         this.board = board;
     }
 }

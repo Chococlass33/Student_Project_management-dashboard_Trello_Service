@@ -9,11 +9,8 @@ import java.util.Set;
 public class Board
 {
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+//    @GeneratedValue(strategy=GenerationType.AUTO)
     private String id;
-    @ManyToOne
-    @JoinColumn(name = "idOrganization",nullable = false)
-    private Organization organization;
     private String name;
     private String description;
     private String descData;
@@ -130,16 +127,6 @@ public class Board
     public void setDateLastModified(Timestamp dateLastModified)
     {
         this.dateLastModified = dateLastModified;
-    }
-
-    public Organization getOrganization()
-    {
-        return organization;
-    }
-
-    public void setOrganization(Organization organization)
-    {
-        this.organization = organization;
     }
 
     public Set<BoardMembership> getBoardMemberships()

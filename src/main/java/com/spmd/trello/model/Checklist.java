@@ -1,18 +1,24 @@
 package com.spmd.trello.model;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-public class Checklist
-{
+public class Checklist {
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+//    @GeneratedValue(strategy = GenerationType.AUTO)
     private String id;
     @ManyToOne
-    @JoinColumn(name = "idCard",nullable = false)
+    @JoinColumn(name = "idCard", nullable = false)
     private Card card;
     private String name;
     private Float pos;
@@ -21,12 +27,12 @@ public class Checklist
 
     @OneToMany(
             mappedBy = "checkList",
-            cascade=CascadeType.ALL
+            cascade = CascadeType.ALL
     )
     private Set<CheckItem> checkItems;
 
-    public Checklist(String id, String idCard, String name, Float pos, Timestamp dateCreated, Timestamp dateLastModified)
-    {
+    public Checklist(String id, Card card, String name, Float pos, Timestamp dateCreated, Timestamp dateLastModified) {
+        this.card = card;
         this.id = id;
         this.name = name;
         this.pos = pos;
@@ -35,78 +41,64 @@ public class Checklist
         checkItems = new HashSet<>();
     }
 
-    protected Checklist(){}
+    protected Checklist() {
+    }
 
-    public String getId()
-    {
+    public String getId() {
         return id;
     }
 
-    public void setId(String id)
-    {
+    public void setId(String id) {
         this.id = id;
     }
 
-    public String getName()
-    {
+    public String getName() {
         return name;
     }
 
-    public void setName(String name)
-    {
+    public void setName(String name) {
         this.name = name;
     }
 
-    public Float getPos()
-    {
+    public Float getPos() {
         return pos;
     }
 
-    public void setPos(Float pos)
-    {
+    public void setPos(Float pos) {
         this.pos = pos;
     }
 
-    public Timestamp getDateCreated()
-    {
+    public Timestamp getDateCreated() {
         return dateCreated;
     }
 
-    public void setDateCreated(Timestamp dateCreated)
-    {
+    public void setDateCreated(Timestamp dateCreated) {
         this.dateCreated = dateCreated;
     }
 
-    public Timestamp getDateLastModified()
-    {
+    public Timestamp getDateLastModified() {
         return dateLastModified;
     }
 
-    public void setDateLastModified(Timestamp dateLastModified)
-    {
+    public void setDateLastModified(Timestamp dateLastModified) {
         this.dateLastModified = dateLastModified;
     }
 
-    public Card getCard()
-    {
+    public Card getCard() {
         return card;
     }
 
-    public void setCard(Card card)
-    {
+    public void setCard(Card card) {
         this.card = card;
     }
 
-    public Set<CheckItem> getCheckItems()
-    {
+    public Set<CheckItem> getCheckItems() {
         return checkItems;
     }
 
-    public void setCheckItems(Set<CheckItem> checkItems)
-    {
+    public void setCheckItems(Set<CheckItem> checkItems) {
         this.checkItems = checkItems;
-        for (CheckItem checkItem:checkItems)
-        {
+        for (CheckItem checkItem : checkItems) {
             checkItem.setCheckList(this);
         }
     }
