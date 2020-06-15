@@ -31,14 +31,14 @@ class CardMemberController
     // Single item
 
     @GetMapping("/CardMember/{id}")
-    CardMember one(@PathVariable String id) {
+    CardMember one(@PathVariable Integer id) {
 
         return repository.findById(id)
                 .orElseThrow(() -> new RuntimeException());
     }
 
     @DeleteMapping("/CardMember/{id}")
-    void deleteCardMember(@PathVariable String id) {
+    void deleteCardMember(@PathVariable Integer id) {
         repository.deleteById(id);
     }
 }

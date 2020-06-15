@@ -31,14 +31,14 @@ class CardLabelController
     // Single item
 
     @GetMapping("/CardLabel/{id}")
-    CardLabel one(@PathVariable String id) {
+    CardLabel one(@PathVariable Integer id) {
 
         return repository.findById(id)
                 .orElseThrow(() -> new RuntimeException());
     }
 
     @DeleteMapping("/CardLabel/{id}")
-    void deleteCardLabel(@PathVariable String id) {
+    void deleteCardLabel(@PathVariable Integer id) {
         repository.deleteById(id);
     }
 }
