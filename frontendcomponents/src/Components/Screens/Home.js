@@ -8,18 +8,26 @@ function Home(props) {
     if (values.integrationId === undefined && values.projectId !== undefined) {
         history.push({
             pathname: "/addBoard",
-            state: {projectId:values.projectId}
+            state: {projectId: values.projectId}
         })
         return (
             <div>
                 Redirecting...
             </div>
         );
+    } else if (values.integrationId && values.projectId) {
+        return (
+            <div>
+                <h1 style={{marginTop: "64px"}}>Home Page</h1>
+                <p>Project ID: {values.projectId}</p>
+                <p>Integration ID: {values.integrationId}</p>
+            </div>
+        );
     } else {
         return (
             <div>
                 <h1 style={{marginTop: "64px"}}>Home Page</h1>
-                <p>Student ID</p>
+                <p>No project or integration selected</p>
             </div>
         );
     }
