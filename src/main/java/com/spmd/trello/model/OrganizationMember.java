@@ -10,8 +10,8 @@ public class OrganizationMember
     @GeneratedValue(strategy=GenerationType.AUTO)
     private String id;
     @ManyToOne
-    @JoinColumn(name = "idOrganisation",nullable = false)
-    private Organization organisation;
+    @JoinColumn(name = "idOrganization",nullable = false)
+    private Organization organization;
     @ManyToOne
     @JoinColumn(name = "idMember",nullable = false)
     private Member member;
@@ -69,13 +69,13 @@ public class OrganizationMember
         this.member = member;
     }
 
-    public Organization getOrganisation()
+    public Organization getOrganization()
     {
-        return organisation;
+        return organization;
     }
 
-    public void setOrganisation(Organization organisation)
+    public void setOrganization(Organization organization)
     {
-        this.organisation = organisation;
+        this.organization = organization;
     }
 }

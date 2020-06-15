@@ -12,8 +12,8 @@ public class Board
     @GeneratedValue(strategy=GenerationType.AUTO)
     private String id;
     @ManyToOne
-    @JoinColumn(name = "idOrganisation",nullable = false)
-    private Organization organisation;
+    @JoinColumn(name = "idOrganization",nullable = false)
+    private Organization organization;
     private String name;
     private String description;
     private String descData;
@@ -132,14 +132,14 @@ public class Board
         this.dateLastModified = dateLastModified;
     }
 
-    public Organization getOrganisation()
+    public Organization getOrganization()
     {
-        return organisation;
+        return organization;
     }
 
-    public void setOrganisation(Organization organisation)
+    public void setOrganization(Organization organization)
     {
-        this.organisation = organisation;
+        this.organization = organization;
     }
 
     public Set<BoardMembership> getBoardMemberships()
