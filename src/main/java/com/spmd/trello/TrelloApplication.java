@@ -30,26 +30,4 @@ public class TrelloApplication {
         return builder.defaultHeader("Accept", "application/json").build();
     }
 
-    @Bean
-    public CommandLineRunner run(RestTemplate restTemplate) {
-        return args -> {
-            WebhookPost webhook = new WebhookPost();
-            webhook.callbackURL = "http://0c26b55f33fe.ngrok.io/webhook";
-            webhook.idModel = "58d89302cd53f765b45d1f3c";
-            webhook.description = "Test webhook Spring";
-
-
-            URI url = UriComponentsBuilder.fromHttpUrl("https://api.trello.com/1/webhooks")
-                    .queryParam("key", API_KEY)
-                    .queryParam("token", TOKEN)
-                    .build().toUri();
-            try {
-                WebhookResponse response = restTemplate.postForObject(url, webhook, WebhookResponse.class);
-                logger.info(response.toString());
-            } catch (HttpClientErrorException e) {
-                logger.info(e.getMessage());
-            }
-        };
-    }
-
 }

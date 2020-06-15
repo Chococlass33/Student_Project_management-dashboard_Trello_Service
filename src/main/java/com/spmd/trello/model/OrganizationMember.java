@@ -1,9 +1,6 @@
 package com.spmd.trello.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.sql.Timestamp;
 
 @Entity
@@ -12,17 +9,19 @@ public class OrganizationMember
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     private String id;
-    private String idOrganisation;
-    private String idMember;
+    @ManyToOne
+    @JoinColumn(name = "idOrganization",nullable = false)
+    private Organization organization;
+    @ManyToOne
+    @JoinColumn(name = "idMember",nullable = false)
+    private Member member;
     private Timestamp dateCreated;
     private Timestamp dateLastModified;
 
-    public OrganizationMember(String id, String idOrganisation, String idMember, Timestamp dateCreated, Timestamp dateLastModified)
+    public OrganizationMember(String id, Timestamp dateCreated, Timestamp dateLastModified)
     {
 
         this.id = id;
-        this.idOrganisation = idOrganisation;
-        this.idMember = idMember;
         this.dateCreated = dateCreated;
         this.dateLastModified = dateLastModified;
     }
@@ -38,26 +37,6 @@ public class OrganizationMember
     public void setId(String id)
     {
         this.id = id;
-    }
-
-    public String getIdOrganisation()
-    {
-        return idOrganisation;
-    }
-
-    public void setIdOrganisation(String idOrganisation)
-    {
-        this.idOrganisation = idOrganisation;
-    }
-
-    public String getIdMember()
-    {
-        return idMember;
-    }
-
-    public void setIdMember(String idMember)
-    {
-        this.idMember = idMember;
     }
 
     public Timestamp getDateCreated()
@@ -78,5 +57,25 @@ public class OrganizationMember
     public void setDateLastModified(Timestamp dateLastModified)
     {
         this.dateLastModified = dateLastModified;
+    }
+
+    public Member getMember()
+    {
+        return member;
+    }
+
+    public void setMember(Member member)
+    {
+        this.member = member;
+    }
+
+    public Organization getOrganization()
+    {
+        return organization;
+    }
+
+    public void setOrganization(Organization organization)
+    {
+        this.organization = organization;
     }
 }

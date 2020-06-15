@@ -1,91 +1,99 @@
 package com.spmd.trello.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import java.sql.Timestamp;
 
 @Entity
-public class Action
-{
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class Action {
+    /* Database related fields */
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+//    @GeneratedValue(strategy = GenerationType.AUTO)
     private String id;
-    private String idMember;
+    @ManyToOne
+    @JoinColumn(name = "idMember", nullable = false)
+    private Member member;
     private String type;
+    @Column(columnDefinition = "MEDIUMTEXT")
     private String data;
     private Timestamp dateCreated;
     private Timestamp dateLastModified;
 
-    protected Action() {}
+    protected Action() {
+    }
 
-    public Action(String idMember, String type, String data, Timestamp dateCreated, Timestamp dateLastModified)
-    {
-        this.idMember = idMember;
+    public Action(String id, Member member, String type, String data, Timestamp dateCreated, Timestamp dateLastModified) {
+        this.id = id;
+        this.member = member;
         this.type = type;
         this.data = data;
         this.dateCreated = dateCreated;
-        this. dateLastModified = dateLastModified;
+        this.dateLastModified = dateLastModified;
     }
 
-    public String getId()
-    {
+    public String getId() {
         return id;
     }
 
-    public void setId(String id)
-    {
+    public void setId(String id) {
         this.id = id;
     }
 
-    public String getIdMember()
-    {
-        return idMember;
-    }
-
-    public void setIdMember(String idMember)
-    {
-        this.idMember = idMember;
-    }
-
-    public String getType()
-    {
+    public String getType() {
         return type;
     }
 
-    public void setType(String type)
-    {
+    public void setType(String type) {
         this.type = type;
     }
 
-    public String getData()
-    {
+    public String getData() {
         return data;
     }
 
-    public void setData(String data)
-    {
+    public void setData(String data) {
         this.data = data;
     }
 
-    public Timestamp getDateCreated()
-    {
+    public Timestamp getDateCreated() {
         return dateCreated;
     }
 
-    public void setDateCreated(Timestamp dateCreated)
-    {
+    public void setDateCreated(Timestamp dateCreated) {
         this.dateCreated = dateCreated;
     }
 
-    public Timestamp getDateLastModified()
-    {
+    public Timestamp getDateLastModified() {
         return dateLastModified;
     }
 
-    public void setDateLastModified(Timestamp dateLastModified)
-    {
+    public void setDateLastModified(Timestamp dateLastModified) {
         this.dateLastModified = dateLastModified;
+    }
+
+    public Member getMember() {
+        return member;
+    }
+
+    public void setMember(Member member) {
+        this.member = member;
+    }
+
+    @Override
+    public String toString() {
+        return "Action{" +
+                "id='" + id + '\'' +
+                ", member=" + member +
+                ", type='" + type + '\'' +
+                ", data='" + data + '\'' +
+                ", dateCreated=" + dateCreated +
+                ", dateLastModified=" + dateLastModified +
+                '}';
     }
 }

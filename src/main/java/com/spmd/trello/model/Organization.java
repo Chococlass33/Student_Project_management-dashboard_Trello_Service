@@ -1,10 +1,9 @@
 package com.spmd.trello.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 public class Organization
@@ -14,23 +13,37 @@ public class Organization
     private String id;
     private String name;
     private String displayName;
-    private String desc;
+    private String description;
     private String descData;
     private String teamType;
     private Timestamp dateCreated;
     private Timestamp dateLastModified;
 
-    public Organization(String id, String name, String displayName, String desc, String descData, String teamType, Timestamp dateCreated, Timestamp dateLastModified)
+    @OneToMany(
+            mappedBy = "organization",
+            cascade=CascadeType.ALL
+    )
+    private Set<OrganizationMember> organizationMembers;
+
+    @OneToMany(
+            mappedBy = "organization",
+            cascade=CascadeType.ALL
+    )
+    private Set<Board> boards;
+
+    public Organization(String id, String name, String displayName, String description, String descData, String teamType, Timestamp dateCreated, Timestamp dateLastModified)
     {
 
         this.id = id;
         this.name = name;
         this.displayName = displayName;
-        this.desc = desc;
+        this.description = description;
         this.descData = descData;
         this.teamType = teamType;
         this.dateCreated = dateCreated;
         this.dateLastModified = dateLastModified;
+        organizationMembers = new HashSet<OrganizationMember>();
+        boards = new HashSet<Board>();
     }
     protected Organization(){}
 
@@ -65,14 +78,14 @@ public class Organization
         this.displayName = displayName;
     }
 
-    public String getDesc()
+    public String getDescription()
     {
-        return desc;
+        return description;
     }
 
-    public void setDesc(String desc)
+    public void setDescription(String description)
     {
-        this.desc = desc;
+        this.description = description;
     }
 
     public String getDescData()
@@ -113,5 +126,33 @@ public class Organization
     public void setDateLastModified(Timestamp dateLastModified)
     {
         this.dateLastModified = dateLastModified;
+    }
+
+    public Set<OrganizationMember> getOrganizationMember()
+    {
+        return organizationMembers;
+    }
+
+    public void setOrganizationMember(Set<OrganizationMember> organizationMembers)
+    {
+        this.organizationMembers = organizationMembers;
+        for(OrganizationMember organizationMember:organizationMembers)
+        {
+            organizationMember.setOrganization(this);
+        }
+    }
+
+    public Set<Board> getBoard()
+    {
+        return boards;
+    }
+
+    public void setBoard(Set<Board> boards)
+    {
+        this.boards = boards;
+        for(Board board:boards)
+        {
+            board.setOrganization(this);
+        }
     }
 }
