@@ -5,7 +5,6 @@ import { Link } from "react-router-dom";
 const toolbar = (props) => (
   <header className="toolbar">
     <nav className="toolbar_navigation">
-      <div></div>
       <div className="toolbar_name">
         <a href="/">Student Project Dashboard- Trello</a>
       </div>
