@@ -1,6 +1,12 @@
 package com.spmd.trello.trelloModel;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 
@@ -9,6 +15,7 @@ import java.util.Date;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class WebhookAction {
+    private static final Logger logger = LoggerFactory.getLogger(WebhookAction.class);
     /**
      * The model that is being monitored
      */
@@ -39,7 +46,7 @@ public class WebhookAction {
          * The id of the board that this model is a part of.
          * If the model is the board itself, then this is null
          */
-        public String idBoard;
+        private String idBoard;
 
         @Override
         public String toString() {
@@ -50,6 +57,14 @@ public class WebhookAction {
                     ", pos=" + pos +
                     ", idBoard='" + idBoard + '\'' +
                     '}';
+        }
+
+        public String getIdBoard() {
+            if (idBoard == null) {
+                return id;
+            } else {
+                return idBoard;
+            }
         }
     }
 
@@ -84,6 +99,15 @@ public class WebhookAction {
                     ", type='" + type + '\'' +
                     ", data=" + data +
                     '}';
+        }
+
+        public String getData() {
+            ObjectMapper mapper = new ObjectMapper();
+            try {
+                return mapper.writeValueAsString(data);
+            } catch (JsonProcessingException e) {
+                return data.toString();
+            }
         }
     }
 }

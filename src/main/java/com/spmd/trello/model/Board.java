@@ -42,6 +42,12 @@ public class Board
     )
     private Set<List> lists;
 
+    @OneToMany(
+            mappedBy = "board",
+            cascade = CascadeType.ALL
+    )
+    private Set<Action> actions;
+
     public Board(String id, String name, String description, String descData, String shortLink, Timestamp dateCreated, Timestamp dateLastModified)
     {
         this.id = id;
@@ -55,6 +61,7 @@ public class Board
         labels = new HashSet<>();
         cards = new HashSet<>();
         lists = new HashSet<>();
+        actions = new HashSet<>();
     }
 
     protected Board(){}
@@ -183,5 +190,13 @@ public class Board
         {
             list.setBoard(this);
         }
+    }
+
+    public Set<Action> getActions() {
+        return actions;
+    }
+
+    public void setActions(Set<Action> actions) {
+        this.actions = actions;
     }
 }

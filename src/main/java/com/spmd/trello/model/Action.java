@@ -1,6 +1,8 @@
 package com.spmd.trello.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -18,18 +20,24 @@ public class Action {
     private String id;
     @ManyToOne
     @JoinColumn(name = "idMember", nullable = false)
+    @JsonIgnore
     private Member member;
     private String type;
     @Column(columnDefinition = "MEDIUMTEXT")
     private String data;
     private Timestamp dateCreated;
     private Timestamp dateLastModified;
+    @ManyToOne
+    @JoinColumn(name = "idBoard", nullable = false)
+    @JsonIgnore
+    private Board board;
 
     protected Action() {
     }
 
-    public Action(String id, Member member, String type, String data, Timestamp dateCreated, Timestamp dateLastModified) {
+    public Action(String id, Board board, Member member, String type, String data, Timestamp dateCreated, Timestamp dateLastModified) {
         this.id = id;
+        this.board = board;
         this.member = member;
         this.type = type;
         this.data = data;
@@ -95,5 +103,23 @@ public class Action {
                 ", dateCreated=" + dateCreated +
                 ", dateLastModified=" + dateLastModified +
                 '}';
+    }
+
+    public Board getBoard() {
+        return board;
+    }
+
+    public void setBoard(Board board) {
+        this.board = board;
+    }
+
+    @JsonProperty
+    public String getMemberId() {
+        return member.getId();
+    }
+
+    @JsonProperty
+    public String getBoardId() {
+        return board.getId();
     }
 }
