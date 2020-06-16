@@ -10,19 +10,19 @@ class Board extends Component {
 
     componentDidMount() {
         const values = queryString.parse(this.props.location.search)
-        fetch(`http://localhost:5002/board/${values.integrationId}`)
+        fetch(`http://167.99.7.70:5002/board/${values.integrationId}`)
             .then(response => response.json())
             .then(board => ({board}))
             .then(data =>
-                fetch(`http://localhost:5002/members`)
+                fetch(`http://167.99.7.70:5002/members`)
                     .then(response => response.json())
                     .then(members => ({...data, members: members})))
             .then(data =>
-                fetch(`http://localhost:5002/cards`)
+                fetch(`http://167.99.7.70:5002/cards`)
                     .then(response => response.json())
                     .then(cards => ({...data, cards: cards})))
             .then(data =>
-                fetch(`http://localhost:5002/lists`)
+                fetch(`http://167.99.7.70:5002/lists`)
                     .then(response => response.json())
                     .then(lists => ({...data, lists: lists})))
             .then(data => this.setState({loaded: true, ...data}))

@@ -168,7 +168,7 @@ class AddBoard extends Component {
             },
             body: JSON.stringify(webhookBody)
         }
-        fetch("http://localhost:5002/webhook/new", request)
+        fetch("http://167.99.7.70:5002/webhook/new", request)
             .then((result) => {
                 if (result.ok) {
                     console.log("Request Succeeded: " + result)

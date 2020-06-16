@@ -10,7 +10,7 @@ class Actions extends Component {
 
     componentDidMount() {
         const values = queryString.parse(this.props.location.search)
-        fetch(`http://localhost:5002/actions?boardId=${values.integrationId}`)
+        fetch(`http://167.99.7.70:5002/actions?boardId=${values.integrationId}`)
             .then(response => response.json())
             .then(actions => actions.sort((one, two) => two.dateCreated.localeCompare(one.dateCreated)))
             .then(actions => {
