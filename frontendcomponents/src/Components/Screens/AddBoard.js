@@ -87,7 +87,7 @@ class AddBoard extends Component {
                                 Unable to create webhook for selected board.<br/>
                                 Please try again, choose a different board, or return to the choose integration page.
 
-                                Error: "{this.state.webhookError}"
+                                Error: "{this.state.webhookError.toString()}"
                             </p>
                             <tbody>{boards}</tbody>
                         </div>

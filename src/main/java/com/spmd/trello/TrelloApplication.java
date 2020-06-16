@@ -19,6 +19,7 @@ public class TrelloApplication {
 
     @Bean
     public WebMvcConfigurer corsConfigurer() {
+        logger.info("Setting CORS ");
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
