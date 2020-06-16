@@ -100,6 +100,7 @@ public class WebhookController {
     @PostMapping(path = "/new")
     public @ResponseBody
     String newWebhook(@RequestBody NewWebhook body) {
+        logger.debug("PING");
         WebhookPost webhook = new WebhookPost();
         webhook.callbackURL = "http://167.99.7.70:5002/webhook";
         webhook.idModel = body.idModel;
