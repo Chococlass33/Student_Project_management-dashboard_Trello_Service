@@ -23,9 +23,6 @@ public class TrelloApplication implements ApplicationRunner {
     private String frontendUrl;
     public static String backendUrl;
 
-    @Autowired
-    private Environment environment;
-
     public static void main(String[] args) {
         SpringApplication.run(TrelloApplication.class, args);
     }
@@ -50,7 +47,7 @@ public class TrelloApplication implements ApplicationRunner {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**").allowedOrigins("http://localhost:3002", frontendUrl);
+                registry.addMapping("/**").allowedOrigins("http://localhost:3002", frontendUrl, "http://167.99.7.70:3002");
             }
         };
     }
