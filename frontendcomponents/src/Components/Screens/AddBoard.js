@@ -172,14 +172,18 @@ class AddBoard extends Component {
             .then((result) => {
                 if (result.ok) {
                     console.log("Request Succeeded: " + result)
-                    this.setState((state, props) => {
-                        return {
-                            ...state,
-                            hasWebhook: true,
-                            webhookError: undefined,
-                            chosenBoard: board
-                        };
-                    })
+                    this.returnIntegrationId(board.id, this.state.projectId)
+                        .then(() => {
+                            this.setState((state, props) => {
+                                return {
+                                    ...state,
+                                    hasWebhook: true,
+                                    webhookError: undefined,
+                                    chosenBoard: board
+                                };
+                            })
+                        });
+
                 } else {
                     result.text()
                         .then(JSON.parse)
@@ -189,6 +193,30 @@ class AddBoard extends Component {
                         })
                 }
             }, this.requestFailed.bind(this))
+    }
+
+    returnIntegrationId(boardId, projectId) {
+        const request = {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                trelloId: boardId,
+                projectId: projectId
+            })
+        }
+        return fetch("http://spmdhomepage-env.eba-upzkmcvz.ap-southeast-2.elasticbeanstalk.com/user-project-service/save-trello", request).then(
+            response => {
+                if (response.ok) {
+                    console.log(`Returned integration id successfully: '${response.text()}'`)
+                } else {
+                    response.text()
+                        .then(JSON.parse)
+                        .then(result => console.log(result.message))
+                }
+            }
+        )
     }
 
     requestFailed(error) {
