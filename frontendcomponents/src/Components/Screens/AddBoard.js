@@ -206,7 +206,7 @@ class AddBoard extends Component {
                 projectId: projectId
             })
         }
-        return fetch("http://spmdhomepage-env.eba-upzkmcvz.ap-southeast-2.elasticbeanstalk.com/user-project-service/save-trello", request).then(
+        return fetch("http://localhost:5000/user-project-service/save-trello", request).then(
             response => {
                 if (response.ok) {
                     console.log(`Returned integration id successfully: '${response.text()}'`)
