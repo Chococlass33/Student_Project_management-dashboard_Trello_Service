@@ -4,7 +4,7 @@ import queryString from 'query-string'
 
 const API_KEY = "38e2c9e0bd5f083ac3e8e19ed8a1a5fa"
 
-// const URL = "localhost:3002"
+// const URL = "167.99.7.70:3002"
 
 class AddBoard extends Component {
 
@@ -71,7 +71,7 @@ class AddBoard extends Component {
                                 <a target="_blank" href={this.state.chosenBoard.url}>Board URL</a>
                             </p>
                             <p>
-                                <a href={`http://localhost:3002/?projectId=${this.state.projectId}&integrationId=${this.state.chosenBoard.id}`}>View
+                                <a href={`http://167.99.7.70:3002/?projectId=${this.state.projectId}&integrationId=${this.state.chosenBoard.id}`}>View
                                     Integration</a>
                                 <br/>
                                 <a href={`http://localhost:3000/project?project_id=${this.state.projectId}`}> Return to
