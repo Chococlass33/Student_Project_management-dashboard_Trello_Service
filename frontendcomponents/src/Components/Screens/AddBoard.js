@@ -3,7 +3,6 @@ import {Component} from "react/cjs/react.production.min.js";
 import queryString from 'query-string'
 
 const API_KEY = "38e2c9e0bd5f083ac3e8e19ed8a1a5fa"
-const URL = "http://6d1815b832ac.au.ngrok.io"
 
 // const URL = "localhost:3002"
 
@@ -146,7 +145,7 @@ class AddBoard extends Component {
             "&name=Student%20Project%20Management%20Dashboard" +
             "&scope=read" +
             "&callback_method=fragment" +
-            `&return_url=${process.env.REACT_APP_DOMAIN}/addBoard?projectId=${projId}` +
+            `&return_url=http://167.99.7.70:3002/addBoard?projectId=${projId}` +
             "&response_type=token" +
             `&key=${API_KEY}`
     }
