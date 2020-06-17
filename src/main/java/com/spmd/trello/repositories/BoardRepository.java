@@ -5,4 +5,6 @@ import com.spmd.trello.model.Board;
 import org.springframework.data.repository.CrudRepository;
 
 public interface BoardRepository extends CrudRepository<Board, String> {
+    @Override
+    boolean existsById(String s);
 }

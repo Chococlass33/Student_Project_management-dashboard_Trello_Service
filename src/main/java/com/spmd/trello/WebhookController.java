@@ -32,7 +32,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -54,7 +53,6 @@ import java.util.Set;
  */
 @Controller // This means that this class is a Controller
 @RequestMapping(path = "/webhook") // This means URL's start with /webhook (after Application path)
-//@CrossOrigin(origins = {"http://localhost:3002", BadConfig.FRONTEND_URL})
 public class WebhookController {
     private static final Logger logger = LoggerFactory.getLogger(WebhookController.class);
     @Autowired
@@ -119,20 +117,51 @@ public class WebhookController {
         } catch (HttpClientErrorException e) {
             logger.error("Unable to make webhook");
             logger.error(e.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, e.getMessage());
+            String message = e.getMessage();
+            if (message != null && message.contains("A webhook with that callback, model, and token already exists")) {
+                /* Webhook already made, lets try to scape data */
+                if (!checkBoardExists(body.idModel)) {
+                    tryScrapeBoard(body.idModel, body.token);
+                    return "Webhook already existed, but board still scraped";
+                } else {
+                    logger.error("Board data already exists. Skipping");
+                    throw new ResponseStatusException(
+                            HttpStatus.BAD_REQUEST, "Board already being tracked");
+                }
+            }
         }
 
+        tryScrapeBoard(body.idModel, body.token);
+
+        return "Webhook created & Board Scraped";
+    }
+
+    /**
+     * Attempts to scape the boards
+     *
+     * @param boardId The id of the board to scape
+     * @param token   The api token to use
+     * @throws ResponseStatusException If there was an issue scraping the board
+     */
+    private void tryScrapeBoard(String boardId, String token) {
         try {
-            scrapeBoard(body.idModel, body.token);
+            scrapeBoard(boardId, token);
         } catch (HttpClientErrorException e) {
             logger.error("Unable to scrape board data");
             logger.error(e.getMessage());
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST, e.getMessage());
         }
+    }
 
-        return "Webhook created & Board Scraped";
+    /**
+     * Checks if a board exists or not
+     *
+     * @param id The id of the board
+     * @return True if an entry matches, false otherwise
+     */
+    private boolean checkBoardExists(String id) {
+        return boardRepository.existsById(id);
     }
 
     /**
