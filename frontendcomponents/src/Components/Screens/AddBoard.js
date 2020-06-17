@@ -74,8 +74,6 @@ class AddBoard extends Component {
                                 <a href={`http://167.99.7.70:3002/?projectId=${this.state.projectId}&integrationId=${this.state.chosenBoard.id}`}>View
                                     Integration</a>
                                 <br/>
-                                <a href={`http://localhost:3000/project?project_id=${this.state.projectId}`}> Return to
-                                    add integration</a>
                             </p>
                         </div>
                     )
@@ -174,15 +172,15 @@ class AddBoard extends Component {
                     console.log("Request Succeeded: " + result)
                     // this.returnIntegrationId(board.id, this.state.projectId)
                     //     .then(() => {
-                            this.setState((state, props) => {
-                                return {
-                                    ...state,
-                                    hasWebhook: true,
-                                    webhookError: undefined,
-                                    chosenBoard: board
-                                };
-                            })
-                        // });
+                    this.setState((state, props) => {
+                        return {
+                            ...state,
+                            hasWebhook: true,
+                            webhookError: undefined,
+                            chosenBoard: board
+                        };
+                    })
+                    // });
 
                 } else {
                     result.text()

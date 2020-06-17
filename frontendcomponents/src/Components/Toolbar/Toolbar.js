@@ -10,6 +10,10 @@ const toolbar = (props) => {
                     <a href="/">Student Project Dashboard- Trello</a>
                 </div>
                 <div className="spacer"/>
+                <p>
+                    <a href={`http://localhost:3000`}> Return to
+                        add integration</a>
+                </p>
                 {/*<div className="toolbar_navigation-items">*/}
                 {/*    <ul>*/}
                 {/*        <Link to="/Activity">*/}
