@@ -8,7 +8,7 @@ import "react-dom";
 import {BrowserRouter as Router, Route, Switch} from "react-router-dom";
 import AddBoard from "./Components/Screens/AddBoard.js";
 
-import queryString from 'query-string'
+// import queryString from 'query-string'
 
 class App extends Component {
 

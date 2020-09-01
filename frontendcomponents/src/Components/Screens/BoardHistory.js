@@ -25,7 +25,7 @@ class BoardHistory extends Component {
 		e.preventDefault();
 		console.log(this.state.startDate.toISOString());
 		// Here, we want to perform the API call, and send information such as:
-		// - IntegrationID
+		// - IntegrationID (?)
 		// - BoardID
 		// - Date (in ISO form)
 	}

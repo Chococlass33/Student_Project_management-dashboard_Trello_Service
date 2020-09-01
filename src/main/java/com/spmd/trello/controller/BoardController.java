@@ -4,13 +4,10 @@ import com.spmd.trello.BadConfig;
 import com.spmd.trello.model.Board;
 import com.spmd.trello.repositories.BoardRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Date;
+import java.util.Optional;
 
 
 //TBD, currently stock placeholder from springboot tutorial until i get the entities right
@@ -40,8 +37,27 @@ class BoardController {
         return repository.findById(id).orElseThrow();
     }
 
+    @GetMapping("/board/{id}")
+    boolean boardHistory(@PathVariable String id, @RequestParam("date") Optional<Date> date) {
+        Optional<Board> retrievedBoard = repository.findById(id);
+
+        boolean output = false;
+        // If board and date are found: perform handleBoardHistory(), otherwise return BoardNotFoundException.
+        output = retrievedBoard.isPresent() && date.isPresent() ? handleBoardHistory(retrievedBoard.get(), date.get()) : false;
+        return output;
+    }
+
     @DeleteMapping("/board/{id}")
     void deleteBoard(@PathVariable String id) {
         repository.deleteById(id);
+    }
+
+    private boolean handleBoardHistory(Board board, Date date) {
+        // Now there is a valid board and date (which should be ISO8601 compliant from front-end).
+        // Now we can use the date to handle and filter actions to a specific time.
+        // Can't continue until method of reconstructing board is found (either through database entries of list/card etc..
+        // Or through webhook actions and reconstructing through a series of actions.
+
+        return true;
     }
 }
