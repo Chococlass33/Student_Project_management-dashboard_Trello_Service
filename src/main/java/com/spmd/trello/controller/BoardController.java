@@ -64,24 +64,17 @@ class BoardController {
         // Now we can use the date to handle and filter actions to a specific time.
         // Can't continue until method of reconstructing board is found (either through database entries of list/card etc..
         // Or through webhook actions and reconstructing through a series of actions.
+
+        // Actions, cards, and lists.
         Set<Action> actions = board.getActions();
-        Set<Action> filteredActions = new HashSet<>();
-
-        // Filter actions.
-        for (Action action: actions
-             ) {
-            // If the date of the action is before the requested date, then add the action to the filtered actions set.
-            if (new Date(action.getDateCreated().getTime()).before(date)) {
-                filteredActions.add(action);
-
-            }
-        }
-
-        // To Do:
-        // Filter cards.
-        // Filter lists.
-        Set<List> lists = board.getLists();
         Set<Card> cards = board.getCards();
+        Set<List> lists = board.getLists();
+
+        // Filter actions, cards, and lists.
+        Set<Action> filteredActions = filterActionsWithDate(date, actions);
+        Set<Card> filteredCards = filterCardsWithDate(date, cards);
+        Set<List> filteredLists = filterListsWithDate(date, lists);
+
 
         // Parse json string from action.data into object and use the data thereafter.
 
@@ -93,9 +86,9 @@ class BoardController {
         for (Action filteredAction : filteredActions) {
             if (isCardMoved(filteredAction)) {
                 // Set the new list of the card.
-                for (Card card : cards) {
-                    if (card.getId() == filteredAction.getData().card.id) {
-                        card.setList(filteredAction.getData().listAfter);
+                for (Card filteredCard : filteredCards) {
+                    if (filteredCard.getId() == filteredAction.getData().card.id) {
+                        filteredCard.setList(filteredAction.getData().listAfter);
                         break;
                     }
                 }
@@ -103,10 +96,49 @@ class BoardController {
         }
 
         // Finally, after all modifications, set new list and cards to board, for eventual display.
-        board.setLists(lists);
-        board.setCards(cards);
+        board.setLists(filteredLists);
+        board.setCards(filteredCards);
 
         return board;
+    }
+
+    private Set<List> filterListsWithDate(Date date, Set<List> lists) {
+        Set<List> filteredLists = new HashSet<>();
+        // Filter lists.
+        for (List list: lists) {
+            // If the date of creation of the list is before the requested date, then add the list to the filtered lists set.
+            if (new Date(list.getDateCreated().getTime()).before(date)) {
+                filteredLists.add(list);
+            }
+        }
+
+        return filteredLists;
+    }
+
+    private Set<Card> filterCardsWithDate(Date date, Set<Card> cards) {
+        Set<Card> filteredCards = new HashSet<>();
+        // Filter cards.
+        for (Card card: cards) {
+            // If the date of creation of the card is before the requested date, then add the card to the filtered cards set.
+            if (new Date(card.getDateCreated().getTime()).before(date)) {
+                filteredCards.add(card);
+            }
+        }
+
+        return filteredCards;
+    }
+
+    private Set<Action> filterActionsWithDate(Date date, Set<Action> actions) {
+        Set<Action> filteredActions = new HashSet<>();
+        // Filter actions.
+        for (Action action: actions) {
+            // If the date of the action is before the requested date, then add the action to the filtered actions set.
+            if (new Date(action.getDateCreated().getTime()).before(date)) {
+                filteredActions.add(action);
+            }
+        }
+
+        return filteredActions;
     }
 
     private boolean isCardMoved(Action action) {
