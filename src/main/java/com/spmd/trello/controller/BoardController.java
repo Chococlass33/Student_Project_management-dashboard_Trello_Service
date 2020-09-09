@@ -1,5 +1,7 @@
 package com.spmd.trello.controller;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.spmd.trello.BadConfig;
 import com.spmd.trello.model.Action;
 import com.spmd.trello.model.Board;
@@ -10,7 +12,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.IOException;
+import java.util.Map;
 
 
 //TBD, currently stock placeholder from springboot tutorial until i get the entities right
@@ -41,17 +50,27 @@ class BoardController {
 //    }
 
     @GetMapping("/board/{id}")
-    Board boardHistory(@PathVariable String id, @RequestParam("date") Optional<Date> date) {
+    Board boardHistory(@PathVariable String id, @RequestParam("date") Optional<String> date) {
         Optional<Board> retrievedBoard = repository.findById(id);
         if (date.isEmpty() && retrievedBoard.isPresent()) {
             return retrievedBoard.get();
         }
-
+        System.out.println("Enter with valid date...");
         Board output;
-        // If board and date are found: perform handleBoardHistory(), otherwise return BoardNotFoundException (or original board).
-        output = retrievedBoard.isPresent() && date.isPresent()
-                ? handleBoardHistory(retrievedBoard.get(), date.get()) : repository.findById(id).orElseThrow();
-        return output;
+        //Convert date. (Use a temp date at the moment).
+        try {
+            String string = "January 2, 2010";
+            DateFormat format = new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH);
+            Date ddate = format.parse(string);
+            // If board and date are found: perform handleBoardHistory(), otherwise return BoardNotFoundException (or original board).
+            output = retrievedBoard.isPresent() && date.isPresent()
+                    ? handleBoardHistory(retrievedBoard.get(), ddate) : repository.findById(id).orElseThrow();
+            return output;
+
+        } catch (Exception e) {
+            System.out.println("Exception encountered");
+        }
+        return retrievedBoard.get();
     }
 
     @DeleteMapping("/board/{id}")
@@ -61,6 +80,7 @@ class BoardController {
 
     private Board handleBoardHistory(Board board, Date date) {
         // Actions, cards, and lists.
+        System.out.println("Entered handleBoardHistory...");
         Set<Action> actions = board.getActions();
         Set<Card> cards = board.getCards();
         Set<List> lists = board.getLists();
@@ -71,8 +91,8 @@ class BoardController {
         Set<List> filteredLists = filterListsWithDate(date, lists);
 
 
+        // Create HashMap for cards and lists for performance.
         HashMap<String, Card> cardMap = new HashMap<>();
-
         for (Card filteredCard : filteredCards) {
             cardMap.put(filteredCard.getId(), filteredCard);
         }
@@ -83,20 +103,21 @@ class BoardController {
             listMap.put(filteredList.getId(), filteredList);
         }
 
-
-        // Parse json string from action.data into object and use the data thereafter.
-
-        // Now we have:
-        // - the set of actions that can recreate the state of the board
-        // - relevant lists of the board
-        // - relevant cards of the board
-        // Consider case where card is updated.
+        // Perform card update functionality.
         for (Action filteredAction : filteredActions) {
-            if (isCardMoved(filteredAction)) {
+            JsonElement root = new JsonParser().parse(filteredAction.getData());
+
+            if (hasCardMoved(filteredAction)) {
                 // Set the new list of the card.
-                cardMap.get(filteredAction.getData().card.id).setList(listMap.get(filteredAction.getData().listAfter));
+                cardMap.get(root.getAsJsonObject().get("card").getAsJsonObject().get("id").getAsString()).setList(listMap.get(root.getAsJsonObject().get("listAfter").getAsString()));
             }
         }
+
+        // Testing print statements.
+        System.out.println(actions);
+        System.out.println(cards);
+        System.out.println(lists);
+        System.out.println(cardMap);
 
         // Finally, after all modifications, set new list and cards to board, for eventual display.
         board.setLists(filteredLists);
@@ -144,7 +165,9 @@ class BoardController {
         return filteredActions;
     }
 
-    private boolean isCardMoved(Action action) {
-        return action.getType() == "updateCard" ? action.getData().listBefore && action.getData().listAfter : false;
+    private boolean hasCardMoved(Action action) {
+        JsonElement root = new JsonParser().parse(action.getData());
+        return action.getType() == "updateCard" && (root.getAsJsonObject().get("listBefore").getAsJsonObject().get("id").getAsString()
+                .equals(root.getAsJsonObject().get("listAfter").getAsJsonObject().get("id").getAsString()));
     }
 }
