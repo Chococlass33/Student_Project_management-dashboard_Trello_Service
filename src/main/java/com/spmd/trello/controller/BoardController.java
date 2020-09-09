@@ -10,10 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.Timestamp;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 
 //TBD, currently stock placeholder from springboot tutorial until i get the entities right
@@ -38,14 +35,17 @@ class BoardController {
 
     // Single item
 
-    @GetMapping("/board/{id}")
-    Board one(@PathVariable String id) {
-        return repository.findById(id).orElseThrow();
-    }
+//    @GetMapping("/board/{id}")
+//    Board one(@PathVariable String id) {
+//        return repository.findById(id).orElseThrow();
+//    }
 
     @GetMapping("/board/{id}")
     Board boardHistory(@PathVariable String id, @RequestParam("date") Optional<Date> date) {
         Optional<Board> retrievedBoard = repository.findById(id);
+        if (date.isEmpty() && retrievedBoard.isPresent()) {
+            return retrievedBoard.get();
+        }
 
         Board output;
         // If board and date are found: perform handleBoardHistory(), otherwise return BoardNotFoundException (or original board).
@@ -60,20 +60,28 @@ class BoardController {
     }
 
     private Board handleBoardHistory(Board board, Date date) {
-        // Now there is a valid board and date (which should be ISO8601 compliant from front-end).
-        // Now we can use the date to handle and filter actions to a specific time.
-        // Can't continue until method of reconstructing board is found (either through database entries of list/card etc..
-        // Or through webhook actions and reconstructing through a series of actions.
-
         // Actions, cards, and lists.
         Set<Action> actions = board.getActions();
         Set<Card> cards = board.getCards();
         Set<List> lists = board.getLists();
 
-        // Filter actions, cards, and lists.
+        // Filter actions, cards, and lists based on a given date.
         Set<Action> filteredActions = filterActionsWithDate(date, actions);
         Set<Card> filteredCards = filterCardsWithDate(date, cards);
         Set<List> filteredLists = filterListsWithDate(date, lists);
+
+
+        HashMap<String, Card> cardMap = new HashMap<>();
+
+        for (Card filteredCard : filteredCards) {
+            cardMap.put(filteredCard.getId(), filteredCard);
+        }
+
+        HashMap<String, List> listMap = new HashMap<>();
+
+        for (List filteredList : filteredLists) {
+            listMap.put(filteredList.getId(), filteredList);
+        }
 
 
         // Parse json string from action.data into object and use the data thereafter.
@@ -86,12 +94,7 @@ class BoardController {
         for (Action filteredAction : filteredActions) {
             if (isCardMoved(filteredAction)) {
                 // Set the new list of the card.
-                for (Card filteredCard : filteredCards) {
-                    if (filteredCard.getId() == filteredAction.getData().card.id) {
-                        filteredCard.setList(filteredAction.getData().listAfter);
-                        break;
-                    }
-                }
+                cardMap.get(filteredAction.getData().card.id).setList(listMap.get(filteredAction.getData().listAfter));
             }
         }
 

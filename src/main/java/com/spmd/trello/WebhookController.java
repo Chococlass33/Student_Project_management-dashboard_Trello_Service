@@ -185,7 +185,7 @@ public class WebhookController {
     /**
      * The list of actions we want to filter for
      */
-    private static final Set<String> VALID_ACTIONS = Set.of("createCard", "updateCard", "deleteCard");
+    private static final Set<String> VALID_ACTIONS = Set.of("createCard", "updateCard", "deleteCard", "moveCardToBoard");
 
     /**
      * Checks if the action type is one that we actually care about
