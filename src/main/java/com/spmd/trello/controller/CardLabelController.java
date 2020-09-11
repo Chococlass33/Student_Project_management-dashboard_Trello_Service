@@ -23,21 +23,21 @@ class CardLabelController
         return repository.findAll();
     }
 
-    @PostMapping("/CardLabel")
+    @PostMapping("/CardLabels")
     CardLabel newCardLabel(@RequestBody CardLabel newCardLabel) {
         return repository.save(newCardLabel);
     }
 
     // Single item
 
-    @GetMapping("/CardLabel/{id}")
+    @GetMapping("/CardLabels/{id}")
     CardLabel one(@PathVariable Integer id) {
 
         return repository.findById(id)
                 .orElseThrow(() -> new RuntimeException());
     }
 
-    @DeleteMapping("/CardLabel/{id}")
+    @DeleteMapping("/CardLabels/{id}")
     void deleteCardLabel(@PathVariable Integer id) {
         repository.deleteById(id);
     }

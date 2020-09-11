@@ -37,7 +37,7 @@ class BoardController {
         return repository.findAll();
     }
 
-    @PostMapping("/board")
+    @PostMapping("/boards")
     Board newBoard(@RequestBody Board newBoard) {
         return repository.save(newBoard);
     }
@@ -49,7 +49,7 @@ class BoardController {
 //        return repository.findById(id).orElseThrow();
 //    }
 
-    @GetMapping("/board/{id}")
+    @GetMapping("/boards/{id}")
     Board boardHistory(@PathVariable String id, @RequestParam("date") Optional<String> date) {
         Optional<Board> retrievedBoard = repository.findById(id);
         if (date.isEmpty() && retrievedBoard.isPresent()) {
@@ -73,7 +73,7 @@ class BoardController {
         return retrievedBoard.get();
     }
 
-    @DeleteMapping("/board/{id}")
+    @DeleteMapping("/boards/{id}")
     void deleteBoard(@PathVariable String id) {
         repository.deleteById(id);
     }

@@ -29,21 +29,21 @@ class ActionController
         return board.getActions();
     }
 
-    @PostMapping("/action")
+    @PostMapping("/actions")
     Action newAction(@RequestBody Action newAction) {
         return repository.save(newAction);
     }
 
     // Single item
 
-    @GetMapping("/action/{id}")
+    @GetMapping("/actions/{id}")
     Action one(@PathVariable String id) {
 
         return repository.findById(id)
                 .orElseThrow(() -> new RuntimeException());
     }
 
-    @DeleteMapping("/action/{id}")
+    @DeleteMapping("/actions/{id}")
     void deleteAction(@PathVariable String id) {
         repository.deleteById(id);
     }

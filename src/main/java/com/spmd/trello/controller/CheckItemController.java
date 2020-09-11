@@ -23,21 +23,21 @@ class CheckItemController
         return repository.findAll();
     }
 
-    @PostMapping("/CheckItem")
+    @PostMapping("/CheckItems")
     CheckItem newCheckItem(@RequestBody CheckItem newCheckItem) {
         return repository.save(newCheckItem);
     }
 
     // Single item
 
-    @GetMapping("/CheckItem/{id}")
+    @GetMapping("/CheckItems/{id}")
     CheckItem one(@PathVariable String id) {
 
         return repository.findById(id)
                 .orElseThrow(() -> new RuntimeException());
     }
 
-    @DeleteMapping("/CheckItem/{id}")
+    @DeleteMapping("/CheckItems/{id}")
     void deleteCheckItem(@PathVariable String id) {
         repository.deleteById(id);
     }

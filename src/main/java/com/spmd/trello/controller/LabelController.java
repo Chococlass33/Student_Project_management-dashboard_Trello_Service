@@ -23,21 +23,21 @@ class LabelController
         return repository.findAll();
     }
 
-    @PostMapping("/Label")
+    @PostMapping("/Labels")
     Label newLabel(@RequestBody Label newLabel) {
         return repository.save(newLabel);
     }
 
     // Single item
 
-    @GetMapping("/Label/{id}")
+    @GetMapping("/Labels/{id}")
     Label one(@PathVariable String id) {
 
         return repository.findById(id)
                 .orElseThrow(() -> new RuntimeException());
     }
 
-    @DeleteMapping("/Label/{id}")
+    @DeleteMapping("/Labels/{id}")
     void deleteLabel(@PathVariable String id) {
         repository.deleteById(id);
     }

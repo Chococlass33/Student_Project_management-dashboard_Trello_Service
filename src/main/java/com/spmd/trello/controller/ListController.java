@@ -24,21 +24,21 @@ class ListController
         return repository.findAll();
     }
 
-    @PostMapping("/list")
+    @PostMapping("/lists")
     List newList(@RequestBody List newList) {
         return repository.save(newList);
     }
 
     // Single item
 
-    @GetMapping("/list/{id}")
+    @GetMapping("/lists/{id}")
     List one(@PathVariable String id) {
 
         return repository.findById(id)
                 .orElseThrow(() -> new RuntimeException());
     }
 
-    @DeleteMapping("/list/{id}")
+    @DeleteMapping("/lists/{id}")
     void deleteList(@PathVariable String id) {
         repository.deleteById(id);
     }

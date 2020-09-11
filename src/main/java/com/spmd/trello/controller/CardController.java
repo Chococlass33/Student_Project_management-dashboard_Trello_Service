@@ -24,21 +24,21 @@ class CardController
         return repository.findAll();
     }
 
-    @PostMapping("/card")
+    @PostMapping("/cards")
     Card newCard(@RequestBody Card newCard) {
         return repository.save(newCard);
     }
 
     // Single item
 
-    @GetMapping("/card/{id}")
+    @GetMapping("/cards/{id}")
     Card one(@PathVariable String id) {
 
         return repository.findById(id)
                 .orElseThrow(() -> new RuntimeException());
     }
 
-    @DeleteMapping("/card/{id}")
+    @DeleteMapping("/cards/{id}")
     void deleteCard(@PathVariable String id) {
         repository.deleteById(id);
     }

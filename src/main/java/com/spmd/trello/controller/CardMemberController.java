@@ -23,21 +23,21 @@ class CardMemberController
         return repository.findAll();
     }
 
-    @PostMapping("/CardMember")
+    @PostMapping("/CardMembers")
     CardMember newCardMember(@RequestBody CardMember newCardMember) {
         return repository.save(newCardMember);
     }
 
     // Single item
 
-    @GetMapping("/CardMember/{id}")
+    @GetMapping("/CardMembers/{id}")
     CardMember one(@PathVariable Integer id) {
 
         return repository.findById(id)
                 .orElseThrow(() -> new RuntimeException());
     }
 
-    @DeleteMapping("/CardMember/{id}")
+    @DeleteMapping("/CardMembers/{id}")
     void deleteCardMember(@PathVariable Integer id) {
         repository.deleteById(id);
     }

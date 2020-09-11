@@ -24,6 +24,9 @@ class BoardHistory extends Component {
 	onFormSubmit(e) {
 		e.preventDefault();
 		console.log(this.state.startDate.toISOString());
+		console.log(this.props);
+		// fetch(`localhost:5002/boards/${boardId}?date=${this.state.startDate.toISOString()}`)
+		// .then
 		// Here, we want to perform the API call, and send information such as:
 		// - IntegrationID (?)
 		// - BoardID
@@ -56,6 +59,7 @@ class BoardHistory extends Component {
 							<button className="btn btn-primary">Confirm Date</button>
 						</div>
 					</form>
+					<div>{this.buildBoardHistory(this.state.board)}</div>
 				</div>
 			);
 		} else {
@@ -65,6 +69,10 @@ class BoardHistory extends Component {
 				</div>
 			);
 		}
+	}
+
+	buildBoardHistory(board) {
+		return <div>"Test"</div>;
 	}
 }
 

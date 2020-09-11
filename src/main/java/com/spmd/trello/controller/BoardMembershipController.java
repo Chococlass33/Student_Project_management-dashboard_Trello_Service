@@ -23,21 +23,21 @@ class BoardMembershipController
         return repository.findAll();
     }
 
-    @PostMapping("/BoardMembership")
+    @PostMapping("/BoardMemberships")
     BoardMembership newBoardMembership(@RequestBody BoardMembership newBoardMembership) {
         return repository.save(newBoardMembership);
     }
 
     // Single item
 
-    @GetMapping("/BoardMembership/{id}")
+    @GetMapping("/BoardMemberships/{id}")
     BoardMembership one(@PathVariable String id) {
 
         return repository.findById(id)
                 .orElseThrow(() -> new RuntimeException());
     }
 
-    @DeleteMapping("/BoardMembership/{id}")
+    @DeleteMapping("/BoardMemberships/{id}")
     void deleteBoardMembership(@PathVariable String id) {
         repository.deleteById(id);
     }

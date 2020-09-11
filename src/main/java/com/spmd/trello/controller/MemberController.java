@@ -24,21 +24,21 @@ class MemberController
         return repository.findAll();
     }
 
-    @PostMapping("/member")
+    @PostMapping("/members")
     Member newMember(@RequestBody Member newMember) {
         return repository.save(newMember);
     }
 
     // Single item
 
-    @GetMapping("/member/{id}")
+    @GetMapping("/members/{id}")
     Member one(@PathVariable String id) {
 
         return repository.findById(id)
                 .orElseThrow(() -> new RuntimeException());
     }
 
-    @DeleteMapping("/member/{id}")
+    @DeleteMapping("/members/{id}")
     void deleteMember(@PathVariable String id) {
         repository.deleteById(id);
     }

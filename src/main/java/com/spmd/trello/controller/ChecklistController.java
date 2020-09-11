@@ -23,21 +23,21 @@ class ChecklistController
         return repository.findAll();
     }
 
-    @PostMapping("/Checklist")
+    @PostMapping("/Checklists")
     Checklist newChecklist(@RequestBody Checklist newChecklist) {
         return repository.save(newChecklist);
     }
 
     // Single item
 
-    @GetMapping("/Checklist/{id}")
+    @GetMapping("/Checklists/{id}")
     Checklist one(@PathVariable String id) {
 
         return repository.findById(id)
                 .orElseThrow(() -> new RuntimeException());
     }
 
-    @DeleteMapping("/Checklist/{id}")
+    @DeleteMapping("/Checklists/{id}")
     void deleteChecklist(@PathVariable String id) {
         repository.deleteById(id);
     }
