@@ -41,4 +41,6 @@ class CardMemberController
     void deleteCardMember(@PathVariable Integer id) {
         repository.deleteById(id);
     }
+
+
 }
