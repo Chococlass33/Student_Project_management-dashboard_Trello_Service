@@ -5,8 +5,6 @@ import queryString from 'query-string'
 
 const API_KEY = "38e2c9e0bd5f083ac3e8e19ed8a1a5fa"
 
-// const URL = "167.99.7.70:3002"
-
 class AddBoard extends Component {
 
     constructor(props) {
@@ -106,7 +104,7 @@ class AddBoard extends Component {
                                 <a target="_blank" href={this.state.chosenBoard.url}>Board URL</a>
                             </p>
                             <p>
-                                <a href={`/?projectId=${this.state.projectId}&integrationId=${this.state.chosenBoard.id}`}>View
+                                <a href={`/?project-id=${this.state.projectId}&trello-id=${this.state.chosenBoard.id}`}>View
                                     Integration</a>
                                 <br/>
                             </p>
@@ -169,12 +167,12 @@ class AddBoard extends Component {
             },
             body: JSON.stringify(webhookBody)
         }
-        fetch("http://3ec31e64b204.au.ngrok.io/webhook/new", request)
+        fetch("http://localhost:5002/webhook/new", request)
             .then((result) => {
                 if (result.ok) {
                     console.log("Request Succeeded: " + result)
                     // this.returnIntegrationId(board.id, this.state.projectId)
-                    //     .then(() => {
+                    //     .then(() => {`
                     this.setState((state, props) => {
                         return {
                             ...state,
