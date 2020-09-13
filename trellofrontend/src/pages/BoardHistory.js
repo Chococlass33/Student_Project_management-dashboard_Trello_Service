@@ -28,8 +28,11 @@ class BoardHistory extends Component {
 
 	onFormSubmit(e) {
 		e.preventDefault();
-		this.setState({ finalDate: this.state.startDate });
-		this.setState({ loaded: false });
+		this.setState({
+			finalDate: this.state.startDate,
+			loaded: false,
+			ready: false,
+		});
 		const finalDate = this.handleDateFormat();
 		fetch(
 			`http://localhost:5002/boardHistory/${this.values['trello-id']}?date=${finalDate}`
@@ -124,12 +127,56 @@ class BoardHistory extends Component {
 		}
 	}
 
+	// The board is built without ordering, and therefore on refreshing the page, elements may move around.
 	buildBoardHistory(board, lists, date) {
 		return (
-			<div className="row">
-				<span className="col-sm-3">Date filtered by: {date}</span>
+			<div className="container">
+				<div className="d-flex flex-row justify-content-center">
+					<span className="text-secondary">Date filtered by: {date}</span>
+				</div>
+				<div className="row mt-3">{this.buildLists(lists)}</div>
 			</div>
 		);
+	}
+
+	// Build a list that is column separated based on the number of lists on the board. This will need rework when list size is large (probably a scrollbar or something).
+	buildLists(lists) {
+		let listElements = lists.length;
+
+		if (listElements > 0) {
+			return lists.map((list) => (
+				<ul
+					key={list.list.id}
+					className={`col-md-${Math.floor(12 / listElements)}`}
+				>
+					<b>List: </b> {list.list.name}
+					<br />
+					{this.buildCards(list)}
+				</ul>
+			));
+		} else {
+			return (
+				<span className="h3 col">
+					No lists were found!
+					<br />
+					Try choosing a different date...
+				</span>
+			);
+		}
+	}
+
+	// Build a column of cards, which is called per list.
+	buildCards(list) {
+		return list.cards.map((card, index) => (
+			// Have cards displayed here instead of using <ul>
+			<ul key={card.card.id} className="col">
+				<p className="h4">Card #{index + 1}</p>
+				<br />
+				<b>Name: </b> "{card.card.name}"<br />
+				<b>Id: </b> "{card.card.id}"<br />
+				<b>Description: </b> "{card.card.description}"<br />
+			</ul>
+		));
 	}
 }
 
