@@ -30,7 +30,6 @@ class AddBoard extends Component {
 
     componentDidMount() {
         if (this.isAuthed() && !this.state.boards) {
-            console.log(Trello)
             console.log("Fetching Boards")
             fetch(`https://api.trello.com/1/members/me/boards?fields=name,url&key=${API_KEY}&token=${Trello.token()}`)
                 .then(res => res.json())
