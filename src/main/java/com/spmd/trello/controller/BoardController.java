@@ -64,9 +64,8 @@ class BoardController {
         Map output;
         //Convert date. (Use a temp date at the moment).
         try {
-            String string = "January 2, 2021";
-            DateFormat format = new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH);
-            Date ddate = format.parse(string);
+                DateFormat format = new SimpleDateFormat("MMddyyyy", Locale.ENGLISH);
+            Date ddate = format.parse(date);
             // If board and date are found: perform handleBoardHistory(), otherwise return BoardNotFoundException (or original board).
             output = handleBoardHistory(retrievedBoard.get(), ddate);
             return output;
