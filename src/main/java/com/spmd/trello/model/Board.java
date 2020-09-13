@@ -217,7 +217,26 @@ public class Board
             Map temp = new HashMap();
             temp.put("list",list);
 
-            temp.put("cards",list.getCards());
+            ArrayList allcards = new ArrayList();
+            for (Card card: list.getCards())
+            {
+                Map cardtemp = new HashMap();
+                cardtemp.put("card", card);
+//                ArrayList labels = new ArrayList();
+//                for (CardLabel label: card.getCardLabels())
+//                {
+//                    labels.add(label.getLabel());
+//                }
+//                cardtemp.put("labels",labels);
+//                ArrayList members = new ArrayList();
+//                for (CardMember member: card.getCardMembers())
+//                {
+//                    members.add(member.getMember());
+//                }
+//                cardtemp.put("members",members);
+                allcards.add(cardtemp);
+            }
+            temp.put("cards",allcards);
             stuff.add(temp);
         }
         result.put("lists",stuff);

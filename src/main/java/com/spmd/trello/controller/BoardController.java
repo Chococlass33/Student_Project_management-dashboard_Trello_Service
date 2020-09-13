@@ -55,20 +55,29 @@ class BoardController {
     }
 
     @GetMapping("/boardHistory/{id}")
-    Map boardHistory(@PathVariable String id, @RequestParam("date") String date) {
+    Map boardHistory(@PathVariable String id, @RequestParam("date") Optional<String> date) {
         Optional<Board> retrievedBoard = repository.findById(id);
         if (date.isEmpty() && retrievedBoard.isPresent()) {
-            return null;
+
         }
         System.out.println("Enter with valid date...");
         Map output;
         //Convert date. (Use a temp date at the moment).
         try {
-                DateFormat format = new SimpleDateFormat("MMddyyyy", Locale.ENGLISH);
-            Date ddate = format.parse(date);
-            // If board and date are found: perform handleBoardHistory(), otherwise return BoardNotFoundException (or original board).
-            output = handleBoardHistory(retrievedBoard.get(), ddate);
-            return output;
+            Date ddate;
+                if(date.isEmpty())
+                {
+                    ddate = new Date();
+                }
+                else
+                {
+                    DateFormat format = new SimpleDateFormat("MMddyyyy", Locale.ENGLISH);
+                    ddate = format.parse(date.get());
+                }
+                System.out.println(ddate);
+                // If board and date are found: perform handleBoardHistory(), otherwise return BoardNotFoundException (or original board).
+                output = handleBoardHistory(retrievedBoard.get(), ddate);
+                return output;
 
         } catch (Exception e) {
             System.out.println("Exception encountered");
