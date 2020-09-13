@@ -4,8 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 public class Board
@@ -205,5 +204,23 @@ public class Board
 
     public void setActions(Set<Action> actions) {
         this.actions = actions;
+    }
+
+    public Map frontEndData()
+    {
+        Map result = new HashMap();
+        result.put("board", this);
+
+        ArrayList stuff = new ArrayList();
+        for (List list : this.lists)
+        {
+            Map temp = new HashMap();
+            temp.put("list",list);
+
+            temp.put("cards",list.getCards());
+            stuff.add(temp);
+        }
+        result.put("lists",stuff);
+        return result;
     }
 }
