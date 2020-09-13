@@ -1,7 +1,9 @@
 package com.spmd.trello.controller;
 
 import com.spmd.trello.model.Board;
+import com.spmd.trello.model.BoardMembership;
 import com.spmd.trello.model.CardMember;
+import com.spmd.trello.model.Member;
 import com.spmd.trello.repositories.BoardRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,7 +16,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 
-//TBD, currently stock placeholder from springboot tutorial until i get the entities right
 @RestController
 class DataController {
     @Autowired
@@ -33,9 +34,15 @@ class DataController {
                 .collect(Collectors.toSet());
         Map<String, Integer> cardCount = new HashMap<>();
         for (CardMember cardMember : cardMembers) {
-             String id = cardMember.getMember().getId();
-             cardCount.put(id, cardCount.getOrDefault(id, 0) + 1);
+            String id = cardMember.getMember().getId();
+            cardCount.put(id, cardCount.getOrDefault(id, 0) + 1);
         }
         return cardCount;
+    }
+
+    @GetMapping(path = "/data/boardMembers/{boardId}")
+    Iterable<Member> getBoardMember(@PathVariable String boardId) {
+        return boardRepo.findById(boardId).stream().flatMap(board -> board.getBoardMemberships().stream())
+                .map(BoardMembership::getMember).collect(Collectors.toList());
     }
 }

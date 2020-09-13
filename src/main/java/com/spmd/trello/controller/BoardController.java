@@ -49,7 +49,12 @@ class BoardController {
 //        return repository.findById(id).orElseThrow();
 //    }
 
-    @GetMapping("/boards/{id}")
+    @GetMapping("/boards/{boardId}")
+    Board getBoard(@PathVariable String boardId) {
+        return repository.findById(boardId).orElseThrow();
+    }
+
+    @GetMapping("/boardHistory/{id}")
     Board boardHistory(@PathVariable String id, @RequestParam("date") Optional<String> date) {
         Optional<Board> retrievedBoard = repository.findById(id);
         if (date.isEmpty() && retrievedBoard.isPresent()) {

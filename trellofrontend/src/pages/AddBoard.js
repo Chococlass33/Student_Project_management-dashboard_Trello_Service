@@ -170,8 +170,8 @@ class AddBoard extends Component {
             .then((result) => {
                 if (result.ok) {
                     console.log("Request Succeeded: " + result)
-                    // this.returnIntegrationId(board.id, this.state.projectId)
-                    //     .then(() => {`
+                    this.returnIntegrationId(board.id, this.state.projectId)
+                        .then(() => {
                     this.setState((state, props) => {
                         return {
                             ...state,
@@ -180,7 +180,7 @@ class AddBoard extends Component {
                             chosenBoard: board
                         };
                     })
-                    // });
+                    });
 
                 } else {
                     result.text()
