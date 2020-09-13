@@ -27,8 +27,15 @@ class ViewBoard extends Component {
                 /* Get how many cards each member is in */
                 .then(data => this.doRequest(`http://localhost:5002/data/cardMembers/${this.state.boardId}`,
                     'cardMembers', data))
+                /* Get card data */
                 .then(data => this.doRequest(`http://localhost:5002/boards/${this.state.boardId}`,
                     'boardData', data))
+                /* Get the size of all the lists */
+                .then(data => this.doRequest(`http://localhost:5002/data/listSizes/${this.state.boardId}`,
+                    'listSizes', data))
+                /* Get the information on the lists */
+                .then(data => this.doRequest(`http://localhost:5002/data/boardLists/${this.state.boardId}`,
+                    'lists', data))
                 /* Save this in the state */
                 .then(data => this.setState({...data, ...this.state, loaded: true}))
         }
@@ -51,23 +58,42 @@ class ViewBoard extends Component {
             })
     }
 
+    processMemberChart () {
+        let nameMap = {};
+        for (let member of this.state.members) {
+            nameMap[member.id] = member.fullName
+        }
+        let chartData = []
+        for (let id in this.state.cardMembers) {
+            if (this.state.cardMembers.hasOwnProperty(id)) {
+                chartData.push([nameMap[id], this.state.cardMembers[id]])
+            }
+        }
+        return chartData
+    }
+
+    processListChart() {
+        let nameMap = {};
+        for (let list of this.state.lists) {
+            nameMap[list.id] = list.name
+        }
+        let chartData = []
+        for (let id in this.state.listSizes) {
+            if (this.state.listSizes.hasOwnProperty(id)) {
+                chartData.push([nameMap[id], this.state.listSizes[id]])
+            }
+        }
+        return chartData
+    }
+
     componentDidUpdate() {
         if (this.state.loaded && !this.state.ready) {
-            console.log(this.state)
-            let nameMap = {};
-            for (let member of this.state.members) {
-                nameMap[member.id] = member.fullName
-            }
-            let chartData = []
-            for (let id in this.state.cardMembers) {
-                if (this.state.cardMembers.hasOwnProperty(id)) {
-                    chartData.push([nameMap[id], this.state.cardMembers[id]])
-                }
-            }
+            console.log("State after API calls", this.state)
             this.setState({
                 ...this.state,
                 ready: true,
-                memberAllocations: chartData
+                memberAllocations: this.processMemberChart(),
+                listSizes: this.processListChart()
             })
         }
     }
@@ -92,8 +118,8 @@ class ViewBoard extends Component {
                                 <ul className="list-group list-group-flush">
                                     <li className="list-group-item">Date Created
                                         - {this.state.boardData.dateCreated}</li>
-                                    <li className="list-group-item">Dapibus ac facilisis in</li>
-                                    <li className="list-group-item">Morbi leo risus</li>
+                                    <li className="list-group-item">Number of Members - {this.state.members.length}</li>
+                                    <li className="list-group-item">Number of Lists - {this.state.lists.length}</li>
                                     <li className="list-group-item">Porta ac consectetur ac</li>
                                     <li className="list-group-item">Vestibulum at eros</li>
                                 </ul>
@@ -131,6 +157,19 @@ class ViewBoard extends Component {
                             <div className="card-body">
                                 <h5 className="card-title">Card Allocation</h5>
                                 <h6 className="card-subtitle mb-2 text-muted">Num of cards in each list</h6>
+                                <Chart
+                                    height={'300px'}
+                                    chartType="PieChart"
+                                    loader={<div>Loading Chart</div>}
+                                    data={[
+                                        ['List', 'Num Cards'],
+                                        ...this.state.listSizes
+                                    ]}
+                                    options={{
+                                        title: 'List Sizes'
+                                    }}
+                                    rootProps={{'data-testid': '1'}}
+                                />
                             </div>
                         </div>
                     </div>
