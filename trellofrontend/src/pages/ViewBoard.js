@@ -51,7 +51,7 @@ class ViewBoard extends Component {
             })
     }
 
-    componentDidUpdate(prevProp, prevState) {
+    componentDidUpdate() {
         if (this.state.loaded && !this.state.ready) {
             console.log(this.state)
             let nameMap = {};
@@ -72,6 +72,7 @@ class ViewBoard extends Component {
         }
     }
 
+
     render() {
         if (!this.state.loaded || !this.state.ready) {
             return (<div>Loading...</div>)
@@ -89,13 +90,18 @@ class ViewBoard extends Component {
                             <div className="card-body">
                                 <h5 className="card-title">Basic Information</h5>
                                 <ul className="list-group list-group-flush">
-                                    <li className="list-group-item">Date Created - {this.state.boardData.dateCreated}</li>
+                                    <li className="list-group-item">Date Created
+                                        - {this.state.boardData.dateCreated}</li>
                                     <li className="list-group-item">Dapibus ac facilisis in</li>
                                     <li className="list-group-item">Morbi leo risus</li>
                                     <li className="list-group-item">Porta ac consectetur ac</li>
                                     <li className="list-group-item">Vestibulum at eros</li>
                                 </ul>
-                                <a href={this.state.boardData.shortLink} target="_blank" className="btn btn-primary float-right">View Board</a>
+                                <a href={this.state.boardData.shortLink} target="_blank"
+                                   className="btn btn-primary float-right">View Board</a>
+                                <a href={`/viewHistory?project-id=${this.state.projectId}&trello-id=${this.state.boardId}`}
+                                    className="btn btn-primary float-left">View
+                                    History</a>
                             </div>
                         </div>
                     </div>
@@ -103,23 +109,17 @@ class ViewBoard extends Component {
                         <div className="card rounded shadow-sm">
                             <div className="card-body">
                                 <h5 className="card-title">Member Breakdown</h5>
-                                <h6 className="card-subtitle mb-2 text-muted">Num of cards assigned</h6>
+                                <h6 className="card-subtitle mb-2 text-muted">Num of cards assigned to Members</h6>
                                 <Chart
                                     height={'300px'}
                                     chartType="PieChart"
-
                                     loader={<div>Loading Chart</div>}
                                     data={[
                                         ['Members', 'Num Cards'],
                                         ...this.state.memberAllocations
                                     ]}
                                     options={{
-                                        title: 'My Daily Activities',
-                                        animation: {
-                                            startup: true,
-                                            easing: 'linear',
-                                            duration: 1500,
-                                        }
+                                        title: 'Card Allocation'
                                     }}
                                     rootProps={{'data-testid': '1'}}
                                 />
@@ -129,10 +129,8 @@ class ViewBoard extends Component {
                     <div className="col">
                         <div className="card rounded shadow-sm">
                             <div className="card-body">
-                                <h5 className="card-title">Basic Information</h5>
-                                <p className="card-text">This will contain basic information about the board</p>
-                                <br/>
-                                <a href="#" className="btn btn-primary float-right">View Board</a>
+                                <h5 className="card-title">Card Allocation</h5>
+                                <h6 className="card-subtitle mb-2 text-muted">Num of cards in each list</h6>
                             </div>
                         </div>
                     </div>
