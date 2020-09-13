@@ -12,12 +12,14 @@ class AddBoard extends Component {
         this.state = {
             projectId: undefined,
             boards: undefined,
+            emailAddress: undefined,
             hasWebhook: false,
             webhookError: undefined,
             chosenBoard: undefined
         };
         if (this.props.location.state) {
             this.state.projectId = this.props.location.state.projectId
+            this.state.emailAddress = this.props.location.state.emailAddress
         } else {
             const values = queryString.parse(this.props.location.search)
             this.state.projectId = values['project-id'];
@@ -170,17 +172,17 @@ class AddBoard extends Component {
             .then((result) => {
                 if (result.ok) {
                     console.log("Request Succeeded: " + result)
-                    this.returnIntegrationId(board.id, this.state.projectId)
+                    this.returnIntegrationId(board)
                         .then(() => {
-                    this.setState((state, props) => {
-                        return {
-                            ...state,
-                            hasWebhook: true,
-                            webhookError: undefined,
-                            chosenBoard: board
-                        };
-                    })
-                    });
+                            this.setState((state, props) => {
+                                return {
+                                    ...state,
+                                    hasWebhook: true,
+                                    webhookError: undefined,
+                                    chosenBoard: board
+                                };
+                            })
+                        });
 
                 } else {
                     result.text()
@@ -193,30 +195,30 @@ class AddBoard extends Component {
             }, this.requestFailed.bind(this))
     }
 
-    returnIntegrationId(boardId, projectId) {
+    returnIntegrationId(board) {
         const request = {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                trelloName:"testName",
-                emailAddress:"test123@gmail.com",
-                trelloId: boardId,
-                projectId: projectId
+                trelloName: board.name,
+                emailAddress: this.state.emailAddress,
+                trelloId: board.id,
+                projectId: this.state.projectId
             })
         }
-        return fetch("http://spmdhomepage-env.eba-upzkmcvz.ap-southeast-2.elasticbeanstalk.com/user-project-service/save-trello", request).then(
-            response => {
-                if (response.ok) {
-                    console.log(`Returned integration id successfully: '${response.text()}'`)
-                } else {
-                    response.text()
-                        .then(JSON.parse)
-                        .then(result => console.log(result.message))
+        return fetch("http://spmdhomepage-env.eba-upzkmcvz.ap-southeast-2.elasticbeanstalk.com/user-project-service/save-trello", request)
+            .then(response => {
+                    if (response.ok) {
+                        console.log(`Returned integration id successfully: '${response.text()}'`)
+                    } else {
+                        response.text()
+                            .then(JSON.parse)
+                            .then(result => console.log(result.message))
+                    }
                 }
-            }
-        )
+            )
     }
 
     requestFailed(error) {

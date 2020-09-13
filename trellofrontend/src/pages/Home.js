@@ -13,7 +13,7 @@ function Home(props) {
         return (
             <Redirect to={{
                 pathname: "/addBoard",
-                state: {projectId: projectId}
+                state: {projectId: projectId, emailAddress: "emailAddress"}
             }}
             />
         )

@@ -51,7 +51,7 @@ class BoardController {
 
     @GetMapping("/boards/{boardId}")
     Board getBoard(@PathVariable String boardId) {
-        return repository.findById(boardId).orElseThrow();
+        return repository.findById(boardId).orElse(null);
     }
 
     @GetMapping("/boardHistory/{id}")

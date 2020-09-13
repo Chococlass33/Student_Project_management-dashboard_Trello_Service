@@ -6,7 +6,6 @@ import com.spmd.trello.model.CardMember;
 import com.spmd.trello.model.List;
 import com.spmd.trello.model.Member;
 import com.spmd.trello.repositories.BoardRepository;
-import com.spmd.trello.trelloModel.WebhookAction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -33,7 +33,11 @@ class DataController {
     @GetMapping(path = "/data/cardMembers/{boardId}")
     Map<String, Integer> getAllMembers(@PathVariable String boardId) {
         logger.info("Getting card memberships for board " + boardId);
-        Board board = boardRepo.findById(boardId).orElseThrow();
+        Optional<Board> boardSearch = boardRepo.findById(boardId);
+        if (boardSearch.isEmpty()) {
+            return null;
+        }
+        Board board = boardSearch.get();
         Set<CardMember> cardMembers = board.getCards()
                 .stream()
                 .flatMap(card -> card.getCardMembers().stream())

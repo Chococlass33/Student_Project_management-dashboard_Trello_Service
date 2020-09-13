@@ -53,12 +53,16 @@ class ViewBoard extends Component {
             .then(response => {
                 let newData = {}
                 newData[prop] = response
-                console.log("data", data)
+                return {...data, ...newData}
+            })
+            .catch(response => {
+                let newData = {}
+                newData[prop] = undefined
                 return {...data, ...newData}
             })
     }
 
-    processMemberChart () {
+    processMemberChart() {
         let nameMap = {};
         for (let member of this.state.members) {
             nameMap[member.id] = member.fullName
@@ -100,8 +104,14 @@ class ViewBoard extends Component {
 
 
     render() {
+        if (!this.state.projectId || !this.state.boardId) {
+            return <h1>Error. No project id and/or board id.</h1>
+        }
         if (!this.state.loaded || !this.state.ready) {
-            return (<div>Loading...</div>)
+            return (<h1>Loading...</h1>)
+        }
+        if (!this.state.boardData) {
+            return (<h1>Invalid Trello Id</h1>)
         }
         return (
             <div className="container-fluid">
@@ -126,7 +136,7 @@ class ViewBoard extends Component {
                                 <a href={this.state.boardData.shortLink} target="_blank"
                                    className="btn btn-primary float-right">View Board</a>
                                 <a href={`/viewHistory?project-id=${this.state.projectId}&trello-id=${this.state.boardId}`}
-                                    className="btn btn-primary float-left">View
+                                   className="btn btn-primary float-left">View
                                     History</a>
                             </div>
                         </div>
