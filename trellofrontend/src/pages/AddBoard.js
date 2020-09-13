@@ -24,7 +24,7 @@ class AddBoard extends Component {
         }
     }
 
-    isAuthed(){
+    isAuthed() {
         return Trello.authorized && Trello.authorized()
     }
 
@@ -200,11 +200,13 @@ class AddBoard extends Component {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
+                trelloName:"testName",
+                emailAddress:"test123@gmail.com",
                 trelloId: boardId,
                 projectId: projectId
             })
         }
-        return fetch("http://localhost:5000/user-project-service/save-trello", request).then(
+        return fetch("http://spmdhomepage-env.eba-upzkmcvz.ap-southeast-2.elasticbeanstalk.com/user-project-service/save-trello", request).then(
             response => {
                 if (response.ok) {
                     console.log(`Returned integration id successfully: '${response.text()}'`)
