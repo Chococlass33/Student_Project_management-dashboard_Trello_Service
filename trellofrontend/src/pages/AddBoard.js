@@ -165,31 +165,35 @@ class AddBoard extends Component {
             body: JSON.stringify(webhookBody)
         }
         fetch("http://167.99.7.70:5002/webhook/new", request)
-            .then((result) => {
-                console.log("Webhook result: ", result)
-                if (result.ok) {
-                    console.log(`Webhook made for board ${board.name} (${board.id})`)
-                    this.returnIntegrationId(board)
-                        .then(() => {
-                            console.log(`Recorded integration id for board ${board.name} (${board.id})`)
-                            this.setState((state, props) => {
-                                return {
-                                    ...state,
-                                    hasWebhook: true,
-                                    webhookError: undefined,
-                                    chosenBoard: board
-                                };
-                            })
-                        });
-                } else {
-                    result.text()
-                        .then(JSON.parse)
-                        .then(result => {
-                            console.log(result.message)
-                            this.requestFailed(result.message)
-                        })
+            .then(response => response.text().then(text => [response, text]))
+            .then(([response, text]) => {
+                switch (text) {
+                    case "Board already tracked":
+                        console.log(text)
+                        this.requestFailed(text)
+                        break;
+                    case "Webhook already existed, but board still scraped":
+                    case "Webhook created & Board Scraped":
+                        console.log(text)
+                        return this.returnIntegrationId(board)
+                            .then(() => {
+                                console.log(`Recorded integration id for board ${board.name} (${board.id})`)
+                                this.setState((state, props) => {
+                                    return {
+                                        ...state,
+                                        hasWebhook: true,
+                                        webhookError: undefined,
+                                        chosenBoard: board
+                                    };
+                                })
+                            });
+                    default:
+                        console.log(`Unknown response when setting webhook. Got text '${text}'`, response)
+                        this.requestFailed(`Unknown response when setting webhook. Got text '${text}'`)
+                        break;
                 }
-            }, this.requestFailed.bind(this))
+            })
+            .catch(reason => this.requestFailed(reason))
     }
 
     returnIntegrationId(board) {
