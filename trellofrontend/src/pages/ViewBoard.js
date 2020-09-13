@@ -129,10 +129,8 @@ class ViewBoard extends Component {
                     <div className="col">
                         <div className="card rounded shadow-sm">
                             <div className="card-body">
-                                <h5 className="card-title">Basic Information</h5>
-                                <p className="card-text">This will contain basic information about the board</p>
-                                <br/>
-                                <a href="#" className="btn btn-primary float-right">View Board</a>
+                                <h5 className="card-title">Card Allocation</h5>
+                                <h6 className="card-subtitle mb-2 text-muted">Num of cards in each list</h6>
                             </div>
                         </div>
                     </div>
