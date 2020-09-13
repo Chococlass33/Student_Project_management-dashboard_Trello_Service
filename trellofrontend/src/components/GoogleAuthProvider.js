@@ -5,11 +5,11 @@ export const GoogleAuthContext = React.createContext({})
 
 const GoogleAuthProvider: FunctionComponent = ({ children }) => {
   const googleAuth = useGoogleLogin({
-    clientId: "12178522373-qsn5v1darojtvbf0cvn8nc1dposfqqub.apps.googleusercontent.com",
+    clientId: "12178522373-ickptrganmbe80cn2dirl89ddj4n18bl.apps.googleusercontent.com",
     persist: true,
     fetchBasicProfile: true,
-    uxMode: "redirect",
-    redirectUri: process.env.REACT_APP_GOOGLE_REDIRECT_URI
+    uxMode: "popup",
+    redirectUri: "http://localhost:3002"
   })
 
   return <GoogleAuthContext.Provider value={googleAuth}>{children}</GoogleAuthContext.Provider>

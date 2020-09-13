@@ -1,11 +1,27 @@
 import React from "react";
 import {Redirect} from 'react-router-dom';
 import queryString from 'query-string'
+import {useGoogleAuth} from "../components/GoogleAuthProvider.js";
+import Loading from "../components/Loading.js";
 
 function Home(props) {
     const values = queryString.parse(props.location.search)
     const projectId = values['project-id'];
     const integrationId = values['trello-id'];
+
+    console.log(useGoogleAuth())
+    const {signIn, googleUser, isInitialized, isSignedIn} = useGoogleAuth()
+    let emailAddress = undefined;
+    if (!isInitialized) {
+        return (<Loading iconColor={"white"}/>)
+    } else if (!isSignedIn) {
+        // refreshUser()
+        signIn()
+        return (<Loading iconColor={"white"}/>)
+    }
+    emailAddress = googleUser.getBasicProfile().getEmail()
+
+
     /* If there is a project, and no integration
      * Then we want to go and add a new one */
     if (integrationId === undefined && projectId !== undefined) {
@@ -13,12 +29,10 @@ function Home(props) {
         return (
             <Redirect to={{
                 pathname: "/addBoard",
-                state: {projectId: projectId, emailAddress: "emailAddress"}
+                state: {projectId: projectId, emailAddress: emailAddress}
             }}
             />
         )
-
-
         /* We have both an integration and a project so we go and display that */
     } else if (integrationId && projectId) {
         return (
