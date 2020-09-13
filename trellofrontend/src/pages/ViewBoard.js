@@ -2,6 +2,7 @@ import React from "react";
 import {Component} from "react/cjs/react.production.min.js";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Chart from "react-google-charts";
+import Loading from "../components/Loading.js";
 
 class ViewBoard extends Component {
     constructor(props) {
@@ -108,7 +109,7 @@ class ViewBoard extends Component {
             return <h1>Error. No project id and/or board id.</h1>
         }
         if (!this.state.loaded || !this.state.ready) {
-            return (<h1>Loading...</h1>)
+            return (<Loading iconColor={"white"}/>)
         }
         if (!this.state.boardData) {
             return (<h1>Invalid Trello Id</h1>)
