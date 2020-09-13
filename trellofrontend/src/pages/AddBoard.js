@@ -36,18 +36,14 @@ class AddBoard extends Component {
             fetch(`https://api.trello.com/1/members/me/boards?fields=name,url&key=${API_KEY}&token=${Trello.token()}`)
                 .then(res => res.json())
                 .then((result) => {
-                        console.log("done")
-                        this.setState((state, props) => {
-                            return {
-                                ...state,
-                                boards: result
-                            };
-                        })
+                        console.log("Boards Fetched")
+                        this.setState((state, props) =>
+                            ({...state, boards: result}))
                     },
                     (error) => {
-                        console.log("error:" + error)
+                        console.log("Error Fetching Board")
                         this.setState((state, props) => {
-                            return state + {boards: undefined};
+                            return {...state, boards: undefined};
                         })
                     })
         }
@@ -56,7 +52,7 @@ class AddBoard extends Component {
     render() {
         /* Authenticate if we need to */
         if (!this.isAuthed()) {
-            console.log("Authenticating")
+            console.log("Authenticating Trello")
             return (<TrelloClient
                 apiKey="38e2c9e0bd5f083ac3e8e19ed8a1a5fa" // Get the API key from https://trello.com/app-key/
                 clientVersion={1} // number: {1}, {2}, {3}
@@ -72,8 +68,10 @@ class AddBoard extends Component {
                 authorizeScopeAccount={true} // boolean: {true} | {false}
                 authorizeExpiration="never" // string: "1hour", "1day", "30days" | "never"
                 authorizeOnSuccess={() => {
+                    console.log("Authenticated Trello")
                 }}
                 authorizeOnError={() => {
+                    console.log("Failed to auth Trello")
                 }}
                 autoAuthorize={true} // boolean: {true} | {false}
                 authorizeButton={true} // boolean: {true} | {false}
@@ -82,11 +80,9 @@ class AddBoard extends Component {
                 buttonText="Authenticate" // string: "Login with Trello"
             />)
         }
-        console.log("Authenticated")
 
         /* Check if we have a token */
         if (this.state.projectId) {
-            console.log("boards: " + this.state.boards)
             if (this.state.boards) {
                 const boards = this.state.boards.map((board, i) =>
                     (<div>
@@ -156,7 +152,7 @@ class AddBoard extends Component {
      * @param token The trello auth token to use
      */
     useBoard(board, token) {
-        console.log(board)
+        console.log(`Setting up board ${board.name} (${board.id})`)
         const webhookBody = {
             idModel: board.id,
             token: token
@@ -170,10 +166,12 @@ class AddBoard extends Component {
         }
         fetch("http://167.99.7.70:5002/webhook/new", request)
             .then((result) => {
+                console.log("Webhook result: ", result)
                 if (result.ok) {
-                    console.log("Request Succeeded: " + result)
+                    console.log(`Webhook made for board ${board.name} (${board.id})`)
                     this.returnIntegrationId(board)
                         .then(() => {
+                            console.log(`Recorded integration id for board ${board.name} (${board.id})`)
                             this.setState((state, props) => {
                                 return {
                                     ...state,
@@ -210,11 +208,9 @@ class AddBoard extends Component {
         return fetch("http://spmdhomepage-env.eba-upzkmcvz.ap-southeast-2.elasticbeanstalk.com/user-project-service/save-trello", request)
             .then(response => {
                     if (response.ok) {
-                        console.log(`Returned integration id successfully: '${response.text()}'`)
+                        console.log("Central service responded OK")
                     } else {
-                        response.text()
-                            .then(JSON.parse)
-                            .then(result => console.log(result.message))
+                        console.log("Central service responded ERROR", response)
                     }
                 }
             )
@@ -222,13 +218,12 @@ class AddBoard extends Component {
 
     requestFailed(error) {
         console.log("Request failed: " + error)
-        this.setState((state, props) => {
-            return {
+        this.setState((state, props) =>
+            ({
                 ...state,
                 hasWebhook: false,
                 webhookError: error
-            };
-        })
+            }))
     }
 }
 
