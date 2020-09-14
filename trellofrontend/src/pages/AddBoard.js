@@ -28,7 +28,6 @@ class AddBoard extends Component {
     }
 
     componentDidMount() {
-        this.setState({...this.state, added: true})
         console.log(`Setting up board ${this.state.chosenBoard.name} (${this.state.chosenBoard.id})`)
         return
         const webhookBody = {
@@ -53,20 +52,22 @@ class AddBoard extends Component {
                     case "Webhook already existed, but board still scraped":
                     case "Webhook created & Board Scraped":
                         console.log(text)
-                        return this.returnIntegrationId(this.state.chosenBoard)
-                            .then(result => {
-                                if (result) {
-                                    console.log(`Recorded integration id for board ${this.state.chosenBoard.name} (${this.state.chosenBoard.id})`)
-                                    this.setState((state, props) => {
-                                        return {
-                                            ...state,
-                                            added: true
-                                        };
-                                    })
-                                } else {
-                                    this.requestFailed("Unable to add integration ID")
-                                }
-                            });
+
+                        this.setState({...this.state, added: true})
+                        // return this.returnIntegrationId(this.state.chosenBoard)
+                        //     .then(result => {
+                        //         if (result) {
+                        //             console.log(`Recorded integration id for board ${this.state.chosenBoard.name} (${this.state.chosenBoard.id})`)
+                        //             this.setState((state, props) => {
+                        //                 return {
+                        //                     ...state,
+                        //                     added: true
+                        //                 };
+                        //             })
+                        //         } else {
+                        //             this.requestFailed("Unable to add integration ID")
+                        //         }
+                        //     });
                     default:
                         console.log(`Unknown response when setting webhook. Got text '${text}'`, response)
                         this.requestFailed(`Unknown response when setting webhook. Got text '${text}'`)
