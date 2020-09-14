@@ -89,10 +89,17 @@ class BoardHistory extends Component {
 
 	render() {
 		if (this.state.loaded) {
+			if (this.state.redirect) {
+				return <Redirect to={this.state.redirect} />;
+			}
 			return (
 				<div>
 					<div className="d-flex flex-row justify-content-start">
-						<button className="primary" onClick={this.redirectToViewBoard}>
+						<button
+							type="button"
+							className="btn btn-primary"
+							onClick={this.redirectToViewBoard}
+						>
 							Back
 						</button>
 					</div>
@@ -135,17 +142,9 @@ class BoardHistory extends Component {
 	}
 
 	redirectToViewBoard = () => {
-		return (
-			<Redirect
-				to={{
-					pathname: `/?project-id=${this.values['project-id']}^trello-id=${this.values['trello-id']}`,
-					state: {
-						projectId: this.values['project-id'],
-						trelloId: this.values['trello-id'],
-					},
-				}}
-			/>
-		);
+		this.setState({
+			redirect: `/?project-id=${this.values['project-id']}&trello-id=${this.values['trello-id']}`,
+		});
 	};
 
 	// The board is built without ordering, and therefore on refreshing the page, elements may move around.
