@@ -1,5 +1,6 @@
 import React from 'react';
 import { Component } from 'react/cjs/react.production.min.js';
+import { Redirect } from 'react-router-dom';
 import DatePicker from 'react-datepicker';
 import queryString from 'query-string';
 
@@ -47,6 +48,7 @@ class BoardHistory extends Component {
 			);
 	}
 
+	// Handles date format for passing through to the backend.
 	handleDateFormat() {
 		let month =
 			this.state.startDate.getUTCMonth() + 1 < 10
@@ -89,6 +91,11 @@ class BoardHistory extends Component {
 		if (this.state.loaded) {
 			return (
 				<div>
+					<div className="d-flex flex-row justify-content-start">
+						<button className="primary" onClick={this.redirectToViewBoard}>
+							Back
+						</button>
+					</div>
 					<div className="pt-3 d-flex flex-row align-items-center">
 						<span className="h3 col">Board history of</span>
 					</div>
@@ -126,6 +133,20 @@ class BoardHistory extends Component {
 			);
 		}
 	}
+
+	redirectToViewBoard = () => {
+		return (
+			<Redirect
+				to={{
+					pathname: `/?project-id=${this.values['project-id']}^trello-id=${this.values['trello-id']}`,
+					state: {
+						projectId: this.values['project-id'],
+						trelloId: this.values['trello-id'],
+					},
+				}}
+			/>
+		);
+	};
 
 	// The board is built without ordering, and therefore on refreshing the page, elements may move around.
 	buildBoardHistory(board, lists, date) {
