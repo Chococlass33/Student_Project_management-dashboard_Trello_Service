@@ -94,7 +94,7 @@ class BoardHistory extends Component {
 			}
 			return (
 				<div>
-					<div className="d-flex flex-row justify-content-start">
+					<div className="pl-1 pt-1 d-flex flex-row justify-content-start">
 						<button
 							type="button"
 							className="btn btn-primary"
@@ -117,17 +117,19 @@ class BoardHistory extends Component {
 								selected={this.state.startDate}
 								onChange={this.handleChange}
 								name="startDate"
+								maxDate={new Date()}
 								dateFormat="MM/dd/yyyy"
 							/>
 							<button className="btn btn-primary">Confirm Date</button>
 						</div>
 					</form>
-					<div>
-						{this.buildBoardHistory(
-							this.state.board,
-							this.state.lists,
-							this.state.finalDate.toISOString()
-						)}
+					<div className="d-flex flex-row justify-content-center">
+						<span className="text-secondary">
+							Date filtered by: {this.state.finalDate.toISOString()}
+						</span>
+					</div>
+					<div className="container">
+						{this.buildBoardHistory(this.state.lists)}
 					</div>
 				</div>
 			);
@@ -148,13 +150,13 @@ class BoardHistory extends Component {
 	};
 
 	// The board is built without ordering, and therefore on refreshing the page, elements may move around.
-	buildBoardHistory(board, lists, date) {
+	buildBoardHistory(lists) {
 		return (
-			<div className="container">
-				<div className="d-flex flex-row justify-content-center">
-					<span className="text-secondary">Date filtered by: {date}</span>
-				</div>
-				<div className="row mt-3">{this.buildLists(lists)}</div>
+			<div
+				className="d-flex flex-row mt-3"
+				style={{ 'overflow-y': window.scroll }}
+			>
+				{this.buildLists(lists)}
 			</div>
 		);
 	}
@@ -165,10 +167,7 @@ class BoardHistory extends Component {
 
 		if (listElements > 0) {
 			return lists.map((list) => (
-				<ul
-					key={list.list.id}
-					className={`col-md-${Math.floor(12 / listElements)}`}
-				>
+				<ul key={list.list.id} className="col-md-3">
 					<b>List: </b> {list.list.name}
 					<br />
 					{this.buildCards(list)}
