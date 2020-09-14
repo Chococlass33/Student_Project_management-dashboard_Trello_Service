@@ -13,11 +13,11 @@ function Home(props) {
     const {signIn, googleUser, isInitialized, isSignedIn} = useGoogleAuth()
     let emailAddress = undefined;
     if (!isInitialized) {
-        return (<Loading iconColor={"white"}/>)
+        return (<Loading iconColor={"black"}/>)
     } else if (!isSignedIn) {
         // refreshUser()
         signIn()
-        return (<Loading iconColor={"white"}/>)
+        return (<Loading iconColor={"black"}/>)
     }
     emailAddress = googleUser.getBasicProfile().getEmail()
 
@@ -28,7 +28,7 @@ function Home(props) {
         /* Firstly, we need to be authenticated */
         return (
             <Redirect to={{
-                pathname: "/addBoard",
+                pathname: "/pickBoard",
                 state: {projectId: projectId, emailAddress: emailAddress}
             }}
             />

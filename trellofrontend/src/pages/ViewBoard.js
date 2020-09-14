@@ -109,7 +109,7 @@ class ViewBoard extends Component {
             return <h1>Error. No project id and/or board id.</h1>
         }
         if (!this.state.loaded || !this.state.ready) {
-            return (<Loading iconColor={"white"}/>)
+            return (<Loading iconColor={"black"}/>)
         }
         if (!this.state.boardData) {
             return (<h1>Invalid Trello Id</h1>)
