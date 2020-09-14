@@ -2,6 +2,11 @@ import React from "react";
 import {Component} from "react/cjs/react.production.min.js";
 import TrelloClient, {Trello} from "react-trello-client";
 import queryString from 'query-string'
+import Card from "react-bootstrap/Card";
+import ListGroup from "react-bootstrap/ListGroup";
+import Container from "react-bootstrap/Container";
+import Modal from "react-bootstrap/Modal";
+import Button from "react-bootstrap/Button";
 
 const API_KEY = "38e2c9e0bd5f083ac3e8e19ed8a1a5fa"
 
@@ -15,7 +20,9 @@ class AddBoard extends Component {
             emailAddress: undefined,
             hasWebhook: false,
             webhookError: undefined,
-            chosenBoard: undefined
+            chosenBoard: undefined,
+            showModal: false,
+            confirmBoard: undefined
         };
         if (this.props.location.state) {
             this.state.projectId = this.props.location.state.projectId
@@ -85,11 +92,9 @@ class AddBoard extends Component {
         if (this.state.projectId) {
             if (this.state.boards) {
                 const boards = this.state.boards.map((board, i) =>
-                    (<div>
-                        Board: {board.name}<br/>
-                        <a target="_blank" href={board.url}>Board URL</a>
-                        <button onClick={this.useBoard.bind(this, board, Trello.token())}>Use Board</button>
-                    </div>)
+                    (<ListGroup.Item action onClick={this.showModal.bind(this, board, Trello.token())}>
+                        {board.name}
+                    </ListGroup.Item>)
                 );
                 if (this.state.hasWebhook) {
                     return (
@@ -122,13 +127,41 @@ class AddBoard extends Component {
                     )
                 } else {
                     return (
-                        <div>
-                            <h1 style={{marginTop: "64px"}}>Add Board</h1>
-                            <tbody>{boards}</tbody>
-                        </div>
+                        <>
+                            <Modal show={this.state.showModal}
+                                   onHide={this.closeModal.bind(this)}>
+                                <Modal.Header closeButton>
+                                    <Modal.Title>Confirm Board</Modal.Title>
+                                </Modal.Header>
+                                <Modal.Body>You are adding the board {this.state.confirmBoard?.name}</Modal.Body>
+                                <Modal.Footer>
+                                    <Button target="_blank"
+                                            variant="secondary"
+                                            href={this.state.confirmBoard?.url}>
+                                        View Board
+                                    </Button>
+                                    <Button variant="primary" onClick={this.closeModal.bind(this)}>
+                                        Confirm
+                                    </Button>
+                                </Modal.Footer>
+                            </Modal>
+                            <Container className="d-flex justify-content-center">
+                                <Card className="w-50">
+                                    <Card.Body>
+                                        <Card.Title>Add a Board</Card.Title>
+                                        <Card.Subtitle className="mb-2 text-muted">Clicking will show more details and
+                                            confirmation</Card.Subtitle>
+                                        <Card.Text>
+                                            <ListGroup>
+                                                {boards}
+                                            </ListGroup>
+                                        </Card.Text>
+                                    </Card.Body>
+                                </Card>
+                            </Container>
+                        </>
                     )
                 }
-
             } else {
                 return (
                     <div>
@@ -144,6 +177,18 @@ class AddBoard extends Component {
                 <p>ERROR</p>
             </div>
         );
+    }
+
+    closeModal() {
+        if (this.state.showModal) {
+            this.setState({...this.state, showModal: false, confirmBoard: undefined})
+        }
+    }
+
+    showModal(board) {
+        if (!this.state.showModal) {
+            this.setState({...this.state, showModal: true, confirmBoard: board})
+        }
     }
 
     /**
