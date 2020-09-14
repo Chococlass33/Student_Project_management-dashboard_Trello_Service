@@ -208,7 +208,7 @@ class BoardHistory extends Component {
 
 	handleCardDescription(description) {
 		const descriptionLength = description.length;
-		const maxLength = 100;
+		const maxLength = 80;
 
 		if (descriptionLength > maxLength) {
 			return description.substring(0, maxLength) + '...';
