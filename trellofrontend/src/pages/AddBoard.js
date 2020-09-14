@@ -29,7 +29,6 @@ class AddBoard extends Component {
 
     componentDidMount() {
         console.log(`Setting up board ${this.state.chosenBoard.name} (${this.state.chosenBoard.id})`)
-        return
         const webhookBody = {
             idModel: this.state.chosenBoard.id,
             token: this.state.token
