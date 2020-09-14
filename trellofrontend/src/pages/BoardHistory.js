@@ -2,6 +2,10 @@ import React from 'react';
 import { Component } from 'react/cjs/react.production.min.js';
 import { Redirect } from 'react-router-dom';
 import DatePicker from 'react-datepicker';
+import Card from 'react-bootstrap/Card';
+import Row from 'react-bootstrap/Row';
+import Container from 'react-bootstrap/Container';
+
 import queryString from 'query-string';
 
 import 'react-datepicker/dist/react-datepicker.css';
@@ -154,7 +158,7 @@ class BoardHistory extends Component {
 		return (
 			<div
 				className="d-flex flex-row mt-3"
-				style={{ 'overflow-y': window.scroll }}
+				style={{ overflowY: window.scroll }}
 			>
 				{this.buildLists(lists)}
 			</div>
@@ -186,16 +190,33 @@ class BoardHistory extends Component {
 
 	// Build a column of cards, which is called per list.
 	buildCards(list) {
-		return list.cards.map((card, index) => (
-			// Have cards displayed here instead of using <ul>
-			<ul key={card.card.id} className="col">
-				<p className="h4">Card #{index + 1}</p>
-				<br />
-				<b>Name: </b> "{card.card.name}"<br />
-				<b>Id: </b> "{card.card.id}"<br />
-				<b>Description: </b> "{card.card.description}"<br />
-			</ul>
+		return list.cards.map((card) => (
+			<Card key={card.card.id} style={{ width: '17rem', height: '13rem' }}>
+				<Card.Body>
+					<Card.Title>{card.card.name}</Card.Title>
+					<Card.Text>
+						{this.handleCardDescription(card.card.description)}
+					</Card.Text>
+				</Card.Body>
+				<Card.Footer>
+					<Card.Link href="#">View members</Card.Link>
+					<Card.Link href="#">View details</Card.Link>
+				</Card.Footer>
+			</Card>
 		));
+	}
+
+	handleCardDescription(description) {
+		const descriptionLength = description.length;
+		const maxLength = 100;
+
+		if (descriptionLength > maxLength) {
+			return description.substring(0, maxLength) + '...';
+		} else if (description !== '') {
+			return description;
+		} else {
+			return 'No description found...';
+		}
 	}
 }
 
