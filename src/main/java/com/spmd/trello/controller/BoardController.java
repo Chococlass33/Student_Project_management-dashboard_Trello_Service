@@ -55,27 +55,34 @@ class BoardController {
     }
 
     @GetMapping("/boardHistory/{id}")
-    Board boardHistory(@PathVariable String id, @RequestParam("date") Optional<String> date) {
+    Map boardHistory(@PathVariable String id, @RequestParam("date") Optional<String> date) {
         Optional<Board> retrievedBoard = repository.findById(id);
         if (date.isEmpty() && retrievedBoard.isPresent()) {
-            return retrievedBoard.get();
+
         }
         System.out.println("Enter with valid date...");
-        Board output;
+        Map output;
         //Convert date. (Use a temp date at the moment).
         try {
-            String string = "January 2, 2010";
-            DateFormat format = new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH);
-            Date ddate = format.parse(string);
-            // If board and date are found: perform handleBoardHistory(), otherwise return BoardNotFoundException (or original board).
-            output = retrievedBoard.isPresent() && date.isPresent()
-                    ? handleBoardHistory(retrievedBoard.get(), ddate) : repository.findById(id).orElseThrow();
-            return output;
+            Date ddate;
+                if(date.isEmpty())
+                {
+                    ddate = new Date();
+                }
+                else
+                {
+                    DateFormat format = new SimpleDateFormat("MMddyyyy", Locale.ENGLISH);
+                    ddate = format.parse(date.get());
+                }
+                System.out.println(ddate);
+                // If board and date are found: perform handleBoardHistory(), otherwise return BoardNotFoundException (or original board).
+                output = handleBoardHistory(retrievedBoard.get(), ddate);
+                return output;
 
         } catch (Exception e) {
             System.out.println("Exception encountered");
         }
-        return retrievedBoard.get();
+        return null;
     }
 
     @DeleteMapping("/boards/{id}")
@@ -83,7 +90,7 @@ class BoardController {
         repository.deleteById(id);
     }
 
-    private Board handleBoardHistory(Board board, Date date) {
+    private Map handleBoardHistory(Board board, Date date) {
         // Actions, cards, and lists.
         System.out.println("Entered handleBoardHistory...");
         Set<Action> actions = board.getActions();
@@ -128,7 +135,7 @@ class BoardController {
         board.setLists(filteredLists);
         board.setCards(filteredCards);
 
-        return board;
+        return board.frontEndData();
     }
 
     private Set<List> filterListsWithDate(Date date, Set<List> lists) {
