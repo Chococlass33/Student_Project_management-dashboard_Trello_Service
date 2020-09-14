@@ -1,9 +1,9 @@
 import React from "react";
 import {Component} from "react/cjs/react.production.min.js";
-import TrelloClient, {Trello} from "react-trello-client";
-import queryString from 'query-string'
-
-const API_KEY = "38e2c9e0bd5f083ac3e8e19ed8a1a5fa"
+import Loading from "../components/Loading.js";
+import Card from "react-bootstrap/Card";
+import Container from "react-bootstrap/Container";
+import Button from "react-bootstrap/Button";
 
 class AddBoard extends Component {
 
@@ -11,151 +11,28 @@ class AddBoard extends Component {
         super(props);
         this.state = {
             projectId: undefined,
-            boards: undefined,
+            chosenBoard: undefined,
             emailAddress: undefined,
-            hasWebhook: false,
-            webhookError: undefined,
-            chosenBoard: undefined
+            token: undefined,
+
+            added: false,
+            errored: false,
+            error: undefined
         };
         if (this.props.location.state) {
             this.state.projectId = this.props.location.state.projectId
+            this.state.chosenBoard = this.props.location.state.chosenBoard
             this.state.emailAddress = this.props.location.state.emailAddress
-        } else {
-            const values = queryString.parse(this.props.location.search)
-            this.state.projectId = values['project-id'];
+            this.state.token = this.props.location.state.token
         }
-    }
-
-    isAuthed() {
-        return Trello.authorized && Trello.authorized()
     }
 
     componentDidMount() {
-        if (this.isAuthed() && !this.state.boards) {
-            console.log("Fetching Boards")
-            fetch(`https://api.trello.com/1/members/me/boards?fields=name,url&key=${API_KEY}&token=${Trello.token()}`)
-                .then(res => res.json())
-                .then((result) => {
-                        console.log("Boards Fetched")
-                        this.setState((state, props) =>
-                            ({...state, boards: result}))
-                    },
-                    (error) => {
-                        console.log("Error Fetching Board")
-                        this.setState((state, props) => {
-                            return {...state, boards: undefined};
-                        })
-                    })
-        }
-    }
-
-    render() {
-        /* Authenticate if we need to */
-        if (!this.isAuthed()) {
-            console.log("Authenticating Trello")
-            return (<TrelloClient
-                apiKey="38e2c9e0bd5f083ac3e8e19ed8a1a5fa" // Get the API key from https://trello.com/app-key/
-                clientVersion={1} // number: {1}, {2}, {3}
-                apiEndpoint="https://api.trello.com" // string: "https://api.trello.com"
-                authEndpoint="https://trello.com" // string: "https://trello.com"
-                intentEndpoint="https://trello.com" // string: "https://trello.com"
-                authorizeName="React Trello Client" // string: "React Trello Client"
-                authorizeType="popup" // string: popup | redirect
-                authorizePersist={true}
-                authorizeInteractive={false}
-                authorizeScopeRead={true} // boolean: {true} | {false}
-                authorizeScopeWrite={true} // boolean: {true} | {false}
-                authorizeScopeAccount={true} // boolean: {true} | {false}
-                authorizeExpiration="never" // string: "1hour", "1day", "30days" | "never"
-                authorizeOnSuccess={() => {
-                    console.log("Authenticated Trello")
-                }}
-                authorizeOnError={() => {
-                    console.log("Failed to auth Trello")
-                }}
-                autoAuthorize={true} // boolean: {true} | {false}
-                authorizeButton={true} // boolean: {true} | {false}
-                buttonStyle="flat" // string: "metamorph" | "flat"
-                buttonColor="grayish-blue" // string: "green" | "grayish-blue" | "light"
-                buttonText="Authenticate" // string: "Login with Trello"
-            />)
-        }
-
-        /* Check if we have a token */
-        if (this.state.projectId) {
-            if (this.state.boards) {
-                const boards = this.state.boards.map((board, i) =>
-                    (<div>
-                        Board: {board.name}<br/>
-                        <a target="_blank" href={board.url}>Board URL</a>
-                        <button onClick={this.useBoard.bind(this, board, Trello.token())}>Use Board</button>
-                    </div>)
-                );
-                if (this.state.hasWebhook) {
-                    return (
-                        <div>
-                            <h1 style={{marginTop: "64px"}}>Add Board</h1>
-                            <p>
-                                Board webhook made for board "{this.state.chosenBoard.name}"
-                                ({this.state.chosenBoard.id})<br/>
-                                <a target="_blank" href={this.state.chosenBoard.url}>Board URL</a>
-                            </p>
-                            <p>
-                                <a href={`/?project-id=${this.state.projectId}&trello-id=${this.state.chosenBoard.id}`}>View
-                                    Integration</a>
-                                <br/>
-                            </p>
-                        </div>
-                    )
-                } else if (this.state.webhookError) {
-                    return (
-                        <div>
-                            <h1 style={{marginTop: "64px"}}>Add Board</h1>
-                            <p>
-                                Unable to create webhook for selected board.<br/>
-                                Please try again, choose a different board, or return to the choose integration page.
-
-                                Error: "{this.state.webhookError.toString()}"
-                            </p>
-                            <tbody>{boards}</tbody>
-                        </div>
-                    )
-                } else {
-                    return (
-                        <div>
-                            <h1 style={{marginTop: "64px"}}>Add Board</h1>
-                            <tbody>{boards}</tbody>
-                        </div>
-                    )
-                }
-
-            } else {
-                return (
-                    <div>
-                        <h1 style={{marginTop: "64px"}}>Add Board</h1>
-                        <p>Loading trello boards</p>
-                    </div>
-                );
-            }
-        }
-        return (
-            <div>
-                <h1 style={{marginTop: "64px"}}>Add Board</h1>
-                <p>ERROR</p>
-            </div>
-        );
-    }
-
-    /**
-     * Contacts the backend API service to setup tracking for the board
-     * @param board The information of the board to track
-     * @param token The trello auth token to use
-     */
-    useBoard(board, token) {
-        console.log(`Setting up board ${board.name} (${board.id})`)
+        console.log(`Setting up board ${this.state.chosenBoard.name} (${this.state.chosenBoard.id})`)
+        return
         const webhookBody = {
-            idModel: board.id,
-            token: token
+            idModel: this.state.chosenBoard.id,
+            token: this.state.token
         }
         const request = {
             method: "POST",
@@ -175,18 +52,22 @@ class AddBoard extends Component {
                     case "Webhook already existed, but board still scraped":
                     case "Webhook created & Board Scraped":
                         console.log(text)
-                        return this.returnIntegrationId(board)
-                            .then(() => {
-                                console.log(`Recorded integration id for board ${board.name} (${board.id})`)
-                                this.setState((state, props) => {
-                                    return {
-                                        ...state,
-                                        hasWebhook: true,
-                                        webhookError: undefined,
-                                        chosenBoard: board
-                                    };
-                                })
-                            });
+
+                        this.setState({...this.state, added: true})
+                        // return this.returnIntegrationId(this.state.chosenBoard)
+                        //     .then(result => {
+                        //         if (result) {
+                        //             console.log(`Recorded integration id for board ${this.state.chosenBoard.name} (${this.state.chosenBoard.id})`)
+                        //             this.setState((state, props) => {
+                        //                 return {
+                        //                     ...state,
+                        //                     added: true
+                        //                 };
+                        //             })
+                        //         } else {
+                        //             this.requestFailed("Unable to add integration ID")
+                        //         }
+                        //     });
                     default:
                         console.log(`Unknown response when setting webhook. Got text '${text}'`, response)
                         this.requestFailed(`Unknown response when setting webhook. Got text '${text}'`)
@@ -195,6 +76,7 @@ class AddBoard extends Component {
             })
             .catch(reason => this.requestFailed(reason))
     }
+
 
     returnIntegrationId(board) {
         const request = {
@@ -212,22 +94,60 @@ class AddBoard extends Component {
         return fetch("http://spmdhomepage-env.eba-upzkmcvz.ap-southeast-2.elasticbeanstalk.com/user-project-service/save-trello", request)
             .then(response => {
                     if (response.ok) {
-                        console.log("Central service responded OK")
+                        console.log("Added integration to the central service")
+                        return true
                     } else {
-                        console.log("Central service responded ERROR", response)
+                        console.log("Failed to add integration to the central service", response)
+                        return false
                     }
                 }
             )
     }
 
     requestFailed(error) {
-        console.log("Request failed: " + error)
+        console.log("Something went wrong", error)
         this.setState((state, props) =>
             ({
                 ...state,
-                hasWebhook: false,
-                webhookError: error
+                error: error.toString(),
+                errored: true
             }))
+    }
+
+    render() {
+        if (this.state.errored) {
+            return (<Container className="d-flex justify-content-center">
+                <Card className="w-50">
+                    <Card.Body>
+                        <Card.Title>Something went wrong</Card.Title>
+                        <Card.Text>
+                            There was an error trying to setup the integration.
+                            <br/>
+                            {this.state.error}
+                        </Card.Text>
+                        <Button variant="primary" href={`/?project-id=${this.state.projectId}`}>Return to add
+                            integration</Button>
+                    </Card.Body>
+                </Card>
+            </Container>)
+        }
+        if (!this.state.added) {
+            return (<Loading iconColor={"black"}/>)
+        }
+        return (<Container className="d-flex justify-content-center">
+            <Card className="w-50">
+                <Card.Body>
+                    <Card.Title>Board Added</Card.Title>
+                    <Card.Subtitle className="mb-2 text-muted">{this.state.chosenBoard.name}</Card.Subtitle>
+                    <Card.Text>
+                        The board was added successfully.
+                    </Card.Text>
+                    <Button variant="primary" href={`/?project-id=${this.state.projectId}&trello-id=${this.state.chosenBoard.id}`}>View Integration</Button>
+                    <Button variant="secondary" href={`/?project-id=${this.state.projectId}`}>Return to add
+                        integration</Button>
+                </Card.Body>
+            </Card>
+        </Container>)
     }
 }
 
