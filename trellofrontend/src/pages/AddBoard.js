@@ -40,40 +40,56 @@ class AddBoard extends Component {
             },
             body: JSON.stringify(webhookBody)
         }
-        fetch("http://167.99.7.70:5002/webhook/new", request)
-            .then(response => response.text().then(text => [response, text]))
-            .then(([response, text]) => {
-                switch (text) {
-                    case "Board already tracked":
-                        console.log(text)
-                        this.requestFailed(text)
-                        break;
-                    case "Webhook already existed, but board still scraped":
-                    case "Webhook created & Board Scraped":
-                        console.log(text)
-
-                        this.setState({...this.state, added: true})
-                        // return this.returnIntegrationId(this.state.chosenBoard)
-                        //     .then(result => {
-                        //         if (result) {
-                        //             console.log(`Recorded integration id for board ${this.state.chosenBoard.name} (${this.state.chosenBoard.id})`)
-                        //             this.setState((state, props) => {
-                        //                 return {
-                        //                     ...state,
-                        //                     added: true
-                        //                 };
-                        //             })
-                        //         } else {
-                        //             this.requestFailed("Unable to add integration ID")
-                        //         }
-                        //     });
-                    default:
-                        console.log(`Unknown response when setting webhook. Got text '${text}'`, response)
-                        this.requestFailed(`Unknown response when setting webhook. Got text '${text}'`)
-                        break;
+        return this.returnIntegrationId(this.state.chosenBoard)
+            .then(result => {
+                if (result) {
+                    console.log(`Recorded integration id for board ${this.state.chosenBoard.name} (${this.state.chosenBoard.id})`)
+                    this.setState((state, props) => {
+                        return {
+                            ...state,
+                            added: true
+                        };
+                    })
+                } else {
+                    this.requestFailed("Unable to add integration ID")
                 }
-            })
-            .catch(reason => this.requestFailed(reason))
+            });
+        //
+        // fetch("http://167.99.7.70:5002/webhook/new", request)
+        //     .then(response => response.text().then(text => [response, text]))
+        //     .then(([response, text]) => {
+        //         switch (text) {
+        //             case "Board already tracked":
+        //                 console.log(text)
+        //                 this.requestFailed(text)
+        //                 break;
+        //             case "Webhook already existed, but board still scraped":
+        //             case "Webhook created & Board Scraped":
+        //                 console.log(text)
+        //
+        //                 this.setState({...this.state, added: true})
+        //                 // break;
+        //                 return this.returnIntegrationId(this.state.chosenBoard)
+        //                     .then(result => {
+        //                         if (result) {
+        //                             console.log(`Recorded integration id for board ${this.state.chosenBoard.name} (${this.state.chosenBoard.id})`)
+        //                             this.setState((state, props) => {
+        //                                 return {
+        //                                     ...state,
+        //                                     added: true
+        //                                 };
+        //                             })
+        //                         } else {
+        //                             this.requestFailed("Unable to add integration ID")
+        //                         }
+        //                     });
+        //             default:
+        //                 console.log(`Unknown response when setting webhook. Got text '${text}'`, response)
+        //                 this.requestFailed(`Unknown response when setting webhook. Got text '${text}'`)
+        //                 break;
+        //         }
+        //     })
+        //     .catch(reason => this.requestFailed(reason))
     }
 
 
@@ -97,6 +113,7 @@ class AddBoard extends Component {
                         return true
                     } else {
                         console.log("Failed to add integration to the central service", response)
+                        response.text().then(console.log)
                         return false
                     }
                 }
