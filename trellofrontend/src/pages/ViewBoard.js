@@ -1,6 +1,5 @@
 import React from "react";
 import {Component} from "react/cjs/react.production.min.js";
-import 'bootstrap/dist/css/bootstrap.min.css';
 import Chart from "react-google-charts";
 import Loading from "../components/Loading.js";
 import Container from "react-bootstrap/Container";
