@@ -3,7 +3,20 @@ import {Component} from "react/cjs/react.production.min.js";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Chart from "react-google-charts";
 import Loading from "../components/Loading.js";
+import Container from "react-bootstrap/Container";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
+import Card from "react-bootstrap/Card";
+import ListGroup from "react-bootstrap/ListGroup";
+import Button from "react-bootstrap/Button";
 
+
+/**
+ * The page that handles showing the visualisations.
+ * Makes API calls,
+ * then processes them,
+ * then displays them using google charts
+ */
 class ViewBoard extends Component {
     constructor(props) {
         super(props);
@@ -19,6 +32,9 @@ class ViewBoard extends Component {
         }
     }
 
+    /**
+     * When the component is mounted, lets make all our api calls
+     */
     componentDidMount() {
         /* If we haven't already do all our requests */
         if (!this.state.loaded) {
@@ -63,6 +79,9 @@ class ViewBoard extends Component {
             })
     }
 
+    /**
+     * Processes the data returned by the API into being useful for the chart
+     */
     processMemberChart() {
         let nameMap = {};
         for (let member of this.state.members) {
@@ -77,6 +96,9 @@ class ViewBoard extends Component {
         return chartData
     }
 
+    /**
+     * Processes the data returned by the API into being useful for the chart
+     */
     processListChart() {
         let nameMap = {};
         for (let list of this.state.lists) {
@@ -91,6 +113,11 @@ class ViewBoard extends Component {
         return chartData
     }
 
+    /**
+     * Once the component updates,
+     * if it's not ready yet, then we process the data we just got
+     * and mark the page ready
+     */
     componentDidUpdate() {
         if (this.state.loaded && !this.state.ready) {
             console.log("State after API calls", this.state)
@@ -105,48 +132,53 @@ class ViewBoard extends Component {
 
 
     render() {
+        /* We have no project or trello id. Something has gone wrong */
         if (!this.state.projectId || !this.state.boardId) {
             return <h1>Error. No project id and/or board id.</h1>
         }
+        /* We have not loaded the data, or not processed it */
         if (!this.state.loaded || !this.state.ready) {
             return (<Loading iconColor={"black"}/>)
         }
+        /* We have no board data */
         if (!this.state.boardData) {
             return (<h1>Invalid Trello Id</h1>)
         }
+        /* Show the visualisations */
         return (
-            <div className="container-fluid">
-                <div className="row">
-                    <h1 className="col">
-                        {this.state.boardData.name}
-                    </h1>
-                </div>
-                <div className="row">
-                    <div className="col">
-                        <div className="card rounded shadow-sm">
-                            <div className="card-body">
-                                <h5 className="card-title">Basic Information</h5>
-                                <ul className="list-group list-group-flush">
-                                    <li className="list-group-item">Date Created
-                                        - {this.state.boardData.dateCreated}</li>
-                                    <li className="list-group-item">Number of Members - {this.state.members.length}</li>
-                                    <li className="list-group-item">Number of Lists - {this.state.lists.length}</li>
-                                    <li className="list-group-item">Porta ac consectetur ac</li>
-                                    <li className="list-group-item">Vestibulum at eros</li>
-                                </ul>
-                                <a href={this.state.boardData.shortLink} target="_blank"
-                                   className="btn btn-primary float-right">View Board</a>
-                                <a href={`/viewHistory?project-id=${this.state.projectId}&trello-id=${this.state.boardId}`}
-                                   className="btn btn-primary float-left">View
-                                    History</a>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="col">
-                        <div className="card rounded shadow-sm">
-                            <div className="card-body">
-                                <h5 className="card-title">Member Breakdown</h5>
-                                <h6 className="card-subtitle mb-2 text-muted">Num of cards assigned to Members</h6>
+            <Container fluid>
+                <Row>
+                    <Col>
+                        <h1>
+                            {this.state.boardData.name}
+                        </h1>
+                    </Col>
+                </Row>
+                <Row>
+                    <Col>
+                        <Card className="rounded shadow-sm">
+                            <Card.Body>
+                                <Card.Title>Basic Information</Card.Title>
+                                <ListGroup variant="flush">
+                                    <ListGroup.Item>Date Created
+                                        - {this.state.boardData.dateCreated}</ListGroup.Item>
+                                    <ListGroup.Item>Number of Members - {this.state.members.length}</ListGroup.Item>
+                                    <ListGroup.Item>Number of Lists - {this.state.lists.length}</ListGroup.Item>
+                                </ListGroup>
+                                <Button className="float-right" href={this.state.boardData.shortLink} varient="primary">View
+                                    Board</Button>
+                                <Button className="float-left"
+                                        href={`/viewHistory?project-id=${this.state.projectId}&trello-id=${this.state.boardId}`}
+                                        varient="primary">View History</Button>
+                            </Card.Body>
+                        </Card>
+                    </Col>
+                    <Col>
+                        <Card className="rounded shadow-sm">
+                            <Card.Body>
+                                <Card.Title>Member Breakdown</Card.Title>
+                                <Card.Subtitle className="mb-2 text-muted">Num of cards assigned to
+                                    Members</Card.Subtitle>
                                 <Chart
                                     height={'300px'}
                                     chartType="PieChart"
@@ -160,14 +192,14 @@ class ViewBoard extends Component {
                                     }}
                                     rootProps={{'data-testid': '1'}}
                                 />
-                            </div>
-                        </div>
-                    </div>
-                    <div className="col">
-                        <div className="card rounded shadow-sm">
-                            <div className="card-body">
-                                <h5 className="card-title">Card Allocation</h5>
-                                <h6 className="card-subtitle mb-2 text-muted">Num of cards in each list</h6>
+                            </Card.Body>
+                        </Card>
+                    </Col>
+                    <Col>
+                        <Card className="rounded shadow-sm">
+                            <Card.Body>
+                                <Card.Title>Card Allocation</Card.Title>
+                                <Card.Subtitle className="mb-2 text-muted">Num of cards in each list</Card.Subtitle>
                                 <Chart
                                     height={'300px'}
                                     chartType="PieChart"
@@ -181,11 +213,11 @@ class ViewBoard extends Component {
                                     }}
                                     rootProps={{'data-testid': '1'}}
                                 />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                            </Card.Body>
+                        </Card>
+                    </Col>
+                </Row>
+            </Container>
         );
     }
 }
