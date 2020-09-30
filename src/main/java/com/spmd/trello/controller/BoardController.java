@@ -127,7 +127,6 @@ class BoardController {
 
     private Board handleBoardHistory(Board board, Date date) {
         // Actions, cards, and lists.
-        System.out.println("Entered handleBoardHistory...");
         Set<Action> actions = board.getActions();
         Set<Card> cards = board.getCards();
         Set<List> lists = board.getLists();
@@ -159,12 +158,6 @@ class BoardController {
                 cardMap.get(root.getAsJsonObject().get("card").getAsJsonObject().get("id").getAsString()).setList(listMap.get(root.getAsJsonObject().get("listAfter").getAsString()));
             }
         }
-
-        // Testing print statements.
-        System.out.println(actions);
-        System.out.println(cards);
-        System.out.println(lists);
-        System.out.println(cardMap);
 
         // Finally, after all modifications, set new list and cards to board, for eventual display.
         board.setLists(filteredLists);
