@@ -164,7 +164,7 @@ class ViewBoard extends Component {
                                     <ListGroup.Item>Number of Members - {this.state.members.length}</ListGroup.Item>
                                     <ListGroup.Item>Number of Lists - {this.state.lists.length}</ListGroup.Item>
                                 </ListGroup>
-                                <Button className="float-right" href={this.state.boardData.shortLink} varient="primary">View
+                                <Button target="_blank" className="float-right" href={this.state.boardData.shortLink} varient="primary">View
                                     Board</Button>
                                 <Button className="float-left"
                                         href={`/viewHistory?project-id=${this.state.projectId}&trello-id=${this.state.boardId}`}
