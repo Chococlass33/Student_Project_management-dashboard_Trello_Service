@@ -3,6 +3,11 @@ import {Component} from 'react/cjs/react.production.min.js';
 import {Redirect} from 'react-router-dom';
 import DatePicker from 'react-datepicker';
 import Card from 'react-bootstrap/Card';
+import Container from "react-bootstrap/Container";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
+import Button from "react-bootstrap/Button";
+import Form from "react-bootstrap/Form";
 
 import queryString from 'query-string';
 
@@ -95,49 +100,53 @@ class BoardHistory extends Component {
                 return <Redirect to={this.state.redirect}/>;
             }
             return (
-                <div>
-                    <div className="pl-1 pt-1 d-flex flex-row justify-content-start">
-                        <button
-                            type="button"
-                            className="btn btn-primary"
-                            onClick={this.redirectToViewBoard}>
-                            Back
-                        </button>
-                    </div>
-                    <div className="pt-3 d-flex flex-row align-items-center">
-                        <span className="h3 col">Board history of</span>
-                    </div>
-                    <div className="d-flex flex-row justify-content-center">
-						<span className="j-self-center h1 border-bottom border-dark">
-							{this.state.board.name}
-						</span>
-                    </div>
-                    <form onSubmit={this.onFormSubmit}>
-                        <div className="pt-3 form-group">
-                            <DatePicker
-                                selected={this.state.startDate}
-                                onChange={this.handleChange}
-                                name="startDate"
-                                maxDate={new Date()}
-                                dateFormat="MM/dd/yyyy"
-                            />
-                            <button className="btn btn-primary">Confirm Date</button>
-                        </div>
-                    </form>
-                    <div className="d-flex flex-row justify-content-center">
-						<span className="text-secondary">
-							Date filtered by: {this.state.finalDate.toISOString()}
-						</span>
-                    </div>
-                    <div className="container">
-                        <div
-                            className="d-flex flex-row mt-3"
-                            style={{overflowY: window.scroll}}
-                        >
+                <Container fluid>
+                    <Row>
+                        <Col>
+                            <Button variant="primary" onClick={this.redirectToViewBoard}>
+                                Back
+                            </Button>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col>
+                            <h3>Board history of</h3>
+                        </Col>
+                    </Row>
+                    <Row className="justify-content-md-center">
+                        <Col md={"auto"}>
+                            <h1 className="border-bottom border-dark">
+                                {this.state.board.name}
+                            </h1>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col>
+                            <Form onSubmit={this.onFormSubmit}>
+                                <DatePicker
+                                    selected={this.state.startDate}
+                                    onChange={this.handleChange}
+                                    name="startDate"
+                                    maxDate={new Date()}
+                                    dateFormat="MM/dd/yyyy"/>
+
+                                <Button variant="primary" className="m-3">Confirm Date </Button>
+                            </Form>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col>
+                            <span className="text-secondary">
+                                Date filtered by: {this.state.finalDate.toISOString()}
+                            </span>
+                        </Col>
+                    </Row>
+                    <Container fluid>
+                        <Row style={{flexWrap: "nowrap"}}>
                             {this.buildLists(this.state.lists)}
-                        </div>
-                    </div>
-                </div>
+                        </Row>
+                    </Container>
+                </Container>
             );
         } else {
             // While component is loading...
@@ -156,16 +165,19 @@ class BoardHistory extends Component {
     };
 
     // Build a list that is column separated based on the number of lists on the board. This will need rework when list size is large (probably a scrollbar or something).
+    /**
+     * Convert multiple lists into visual representations.
+     * Relies on the buildCards method to convert all the cards in a list into visual cards
+     * @param lists The lists to convert
+     */
     buildLists(lists) {
-        let listElements = lists.length;
-
-        if (listElements > 0) {
+        if (lists.length > 0) {
             return lists.map(list => (
-                <ul key={list.list.id} className="col-md-3">
+                <Col>
                     <b>List: </b> {list.list.name}
                     <br/>
                     {this.buildCards(list)}
-                </ul>
+                </Col>
             ));
         } else {
             return (
@@ -179,9 +191,13 @@ class BoardHistory extends Component {
     }
 
     // Build a column of cards, which is called per list.
+    /**
+     * Produce a visual representation of all the cards in a list
+     * @param list The list to convert
+     */
     buildCards(list) {
         return list.cards.map((card) => (
-            <Card key={card.id} style={{width: '17rem', height: '13rem'}}>
+            <Card key={card.id} className="m-2" style={{width: '17rem', height: '13rem'}}>
                 <Card.Body>
                     <Card.Title>{card.name}</Card.Title>
                     <Card.Text>
@@ -196,16 +212,19 @@ class BoardHistory extends Component {
         ));
     }
 
+    /**
+     * Truncate the card description if it gets too long
+     * @param description The description to truncate
+     * @returns {string|*} The truncated description
+     */
     handleCardDescription(description) {
         const descriptionLength = description.length;
         const maxLength = 80;
 
         if (descriptionLength > maxLength) {
             return description.substring(0, maxLength) + '...';
-        } else if (description !== '') {
-            return description;
         } else {
-            return 'No description found...';
+            return description;
         }
     }
 }
