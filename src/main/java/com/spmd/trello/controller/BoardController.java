@@ -47,13 +47,6 @@ class BoardController {
         return repository.save(newBoard);
     }
 
-    // Single item
-
-//    @GetMapping("/board/{id}")
-//    Board one(@PathVariable String id) {
-//        return repository.findById(id).orElseThrow();
-//    }
-
     @GetMapping("/boards/{boardId}")
     Board getBoard(@PathVariable String boardId) {
         return repository.findById(boardId).orElse(null);
