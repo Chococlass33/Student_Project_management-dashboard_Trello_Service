@@ -2,24 +2,29 @@ package com.spmd.trello.controller;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-import com.spmd.trello.BadConfig;
 import com.spmd.trello.model.Action;
 import com.spmd.trello.model.Board;
 import com.spmd.trello.model.Card;
 import com.spmd.trello.model.List;
 import com.spmd.trello.repositories.BoardRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import java.io.IOException;
-import java.util.Map;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 
 //TBD, currently stock placeholder from springboot tutorial until i get the entities right
@@ -55,29 +60,28 @@ class BoardController {
     }
 
     @GetMapping("/boardHistory/{id}")
-    Map boardHistory(@PathVariable String id, @RequestParam("date") Optional<String> date) {
+    HistoryResponse boardHistory(@PathVariable String id, @RequestParam("date") Optional<String> date) {
         Optional<Board> retrievedBoard = repository.findById(id);
         if (date.isEmpty() && retrievedBoard.isPresent()) {
 
         }
         System.out.println("Enter with valid date...");
-        Map output;
         //Convert date. (Use a temp date at the moment).
         try {
             Date ddate;
-                if(date.isEmpty())
-                {
-                    ddate = new Date();
-                }
-                else
-                {
-                    DateFormat format = new SimpleDateFormat("MMddyyyy", Locale.ENGLISH);
-                    ddate = format.parse(date.get());
-                }
-                System.out.println(ddate);
-                // If board and date are found: perform handleBoardHistory(), otherwise return BoardNotFoundException (or original board).
-                output = handleBoardHistory(retrievedBoard.get(), ddate);
-                return output;
+            if (date.isEmpty()) {
+                ddate = new Date();
+            } else {
+                DateFormat format = new SimpleDateFormat("MMddyyyy", Locale.ENGLISH);
+                ddate = format.parse(date.get());
+            }
+            System.out.println(ddate);
+            // If board and date are found: perform handleBoardHistory(), otherwise return BoardNotFoundException (or original board).
+            Board board = handleBoardHistory(retrievedBoard.get(), ddate);
+            HistoryResponse output = new HistoryResponse();
+            output.board = board;
+            board.getLists().forEach(output::addList);
+            return output;
 
         } catch (Exception e) {
             System.out.println("Exception encountered");
@@ -85,12 +89,48 @@ class BoardController {
         return null;
     }
 
+    /**
+     * A class for encoding the json response for the board history
+     */
+    private static class HistoryResponse {
+        /**
+         * The board
+         */
+        public Board board;
+        /**
+         * The lists in that board
+         * Uses a subclass to encode the list data and the card data as a tuple-like
+         */
+        public Set<HistoryList> lists = new HashSet<>();
+
+        /**
+         * Class representing the combination of a list and it's cards
+         */
+        private static class HistoryList {
+            public List list;
+            public Set<Card> cards;
+        }
+
+        /**
+         * Add a new list to the history
+         * Records the list data and all the cards on that list
+         *
+         * @param list The list to add
+         */
+        public void addList(List list) {
+            HistoryList historyList = new HistoryList();
+            historyList.list = list;
+            historyList.cards = list.getCards();
+            lists.add(historyList);
+        }
+    }
+
     @DeleteMapping("/boards/{id}")
     void deleteBoard(@PathVariable String id) {
         repository.deleteById(id);
     }
 
-    private Map handleBoardHistory(Board board, Date date) {
+    private Board handleBoardHistory(Board board, Date date) {
         // Actions, cards, and lists.
         System.out.println("Entered handleBoardHistory...");
         Set<Action> actions = board.getActions();
@@ -135,13 +175,13 @@ class BoardController {
         board.setLists(filteredLists);
         board.setCards(filteredCards);
 
-        return board.frontEndData();
+        return board;
     }
 
     private Set<List> filterListsWithDate(Date date, Set<List> lists) {
         Set<List> filteredLists = new HashSet<>();
         // Filter lists.
-        for (List list: lists) {
+        for (List list : lists) {
             // If the date of creation of the list is before the requested date, then add the list to the filtered lists set.
             if (new Date(list.getDateCreated().getTime()).before(date)) {
                 filteredLists.add(list);
@@ -152,34 +192,20 @@ class BoardController {
     }
 
     private Set<Card> filterCardsWithDate(Date date, Set<Card> cards) {
-        Set<Card> filteredCards = new HashSet<>();
-        // Filter cards.
-        for (Card card: cards) {
-            // If the date of creation of the card is before the requested date, then add the card to the filtered cards set.
-            if (new Date(card.getDateCreated().getTime()).before(date)) {
-                filteredCards.add(card);
-            }
-        }
-
-        return filteredCards;
+        return cards.stream() // Stream to let us do fancy things
+                .filter(card -> new Date(card.getDateCreated().getTime()).before(date)) // Filter only those with the date
+                .collect(Collectors.toSet()); // Turn into a set
     }
 
     private Set<Action> filterActionsWithDate(Date date, Set<Action> actions) {
-        Set<Action> filteredActions = new HashSet<>();
-        // Filter actions.
-        for (Action action: actions) {
-            // If the date of the action is before the requested date, then add the action to the filtered actions set.
-            if (new Date(action.getDateCreated().getTime()).before(date)) {
-                filteredActions.add(action);
-            }
-        }
-
-        return filteredActions;
+        return actions.stream() // Stream to let us do fancy things
+                .filter(card -> new Date(card.getDateCreated().getTime()).before(date)) // Filter only those with the date
+                .collect(Collectors.toSet()); // Turn into a set
     }
 
     private boolean hasCardMoved(Action action) {
         JsonElement root = new JsonParser().parse(action.getData());
-        return action.getType() == "updateCard" && (root.getAsJsonObject().get("listBefore").getAsJsonObject().get("id").getAsString()
+        return action.getType().equals("updateCard") && (root.getAsJsonObject().get("listBefore").getAsJsonObject().get("id").getAsString()
                 .equals(root.getAsJsonObject().get("listAfter").getAsJsonObject().get("id").getAsString()));
     }
 }
