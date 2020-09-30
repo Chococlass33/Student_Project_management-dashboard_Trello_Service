@@ -7,6 +7,8 @@ import com.spmd.trello.model.Board;
 import com.spmd.trello.model.Card;
 import com.spmd.trello.model.List;
 import com.spmd.trello.repositories.BoardRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -30,6 +32,10 @@ import java.util.stream.Collectors;
 //TBD, currently stock placeholder from springboot tutorial until i get the entities right
 @RestController
 class BoardController {
+    private static final Logger logger = LoggerFactory.getLogger(BoardController.class);
+
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("MMddyyyy", Locale.ENGLISH);
+
     @Autowired
     private final BoardRepository repository;
 
@@ -53,33 +59,29 @@ class BoardController {
     }
 
     @GetMapping("/boardHistory/{id}")
-    HistoryResponse boardHistory(@PathVariable String id, @RequestParam("date") Optional<String> date) {
+    HistoryResponse boardHistory(@PathVariable String id, @RequestParam("date") Optional<String> rawDate) {
         Optional<Board> retrievedBoard = repository.findById(id);
-        if (date.isEmpty() && retrievedBoard.isPresent()) {
-
+        if (retrievedBoard.isEmpty()) {
+            logger.error("Unable to get board " + id);
+            return null;
         }
-        System.out.println("Enter with valid date...");
-        //Convert date. (Use a temp date at the moment).
-        try {
-            Date ddate;
-            if (date.isEmpty()) {
-                ddate = new Date();
-            } else {
-                DateFormat format = new SimpleDateFormat("MMddyyyy", Locale.ENGLISH);
-                ddate = format.parse(date.get());
+        Date ddate;
+        if (rawDate.isEmpty()) {
+            ddate = new Date();
+        } else {
+            try {
+                ddate = DATE_FORMAT.parse(rawDate.get());
+            } catch (ParseException e) {
+                logger.error("Unable to get parse date");
+                return null;
             }
-            System.out.println(ddate);
-            // If board and date are found: perform handleBoardHistory(), otherwise return BoardNotFoundException (or original board).
-            Board board = handleBoardHistory(retrievedBoard.get(), ddate);
-            HistoryResponse output = new HistoryResponse();
-            output.board = board;
-            board.getLists().forEach(output::addList);
-            return output;
-
-        } catch (Exception e) {
-            System.out.println("Exception encountered");
         }
-        return null;
+        Board board = handleBoardHistory(retrievedBoard.get(), ddate);
+        HistoryResponse output = new HistoryResponse();
+        output.board = board;
+        board.getLists().forEach(output::addList);
+        return output;
+
     }
 
     /**
