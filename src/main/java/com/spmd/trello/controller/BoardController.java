@@ -157,7 +157,7 @@ class BoardController {
 
         // Perform card update functionality.
         for (Action filteredAction : filteredActions) {
-            JsonElement root = new JsonParser().parse(filteredAction.getData());
+            JsonElement root = JsonParser.parseString(filteredAction.getData());
 
             if (hasCardMoved(filteredAction)) {
                 // Set the new list of the card.
@@ -179,16 +179,9 @@ class BoardController {
     }
 
     private Set<List> filterListsWithDate(Date date, Set<List> lists) {
-        Set<List> filteredLists = new HashSet<>();
-        // Filter lists.
-        for (List list : lists) {
-            // If the date of creation of the list is before the requested date, then add the list to the filtered lists set.
-            if (new Date(list.getDateCreated().getTime()).before(date)) {
-                filteredLists.add(list);
-            }
-        }
-
-        return filteredLists;
+        return lists.stream() // Stream to let us do fancy things
+                .filter(card -> new Date(card.getDateCreated().getTime()).before(date)) // Filter only those with the date
+                .collect(Collectors.toSet()); // Turn into a set
     }
 
     private Set<Card> filterCardsWithDate(Date date, Set<Card> cards) {
@@ -204,7 +197,7 @@ class BoardController {
     }
 
     private boolean hasCardMoved(Action action) {
-        JsonElement root = new JsonParser().parse(action.getData());
+        JsonElement root = JsonParser.parseString(action.getData());
         return action.getType().equals("updateCard") && (root.getAsJsonObject().get("listBefore").getAsJsonObject().get("id").getAsString()
                 .equals(root.getAsJsonObject().get("listAfter").getAsJsonObject().get("id").getAsString()));
     }
