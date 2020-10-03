@@ -1,6 +1,5 @@
 import React from "react";
 import {Component} from "react/cjs/react.production.min.js";
-import TrelloClient, {Trello} from "react-trello-client";
 import queryString from 'query-string'
 import Card from "react-bootstrap/Card";
 import ListGroup from "react-bootstrap/ListGroup";
@@ -24,25 +23,24 @@ class PickBoard extends Component {
             chosenBoard: undefined,
             showModal: false,
             confirmBoard: undefined,
-            redirect: false
+            redirect: false,
+            token: undefined
         };
         if (this.props.location.state) {
             this.state.projectId = this.props.location.state.projectId
             this.state.emailAddress = this.props.location.state.emailAddress
+            this.state.token = this.props.location.state.token
         } else {
             const values = queryString.parse(this.props.location.search)
             this.state.projectId = values['project-id'];
         }
     }
 
-    isAuthed() {
-        return Trello.authorized && Trello.authorized()
-    }
 
     componentDidMount() {
-        if (this.isAuthed() && !this.state.boards) {
+        if (!this.state.boards) {
             console.log("Fetching Boards")
-            fetch(`https://api.trello.com/1/members/me/boards?fields=name,url&key=${API_KEY}&token=${Trello.token()}`)
+            fetch(`https://api.trello.com/1/members/me/boards?fields=name,url&key=${API_KEY}&token=${this.state.token}`)
                 .then(res => res.json())
                 .then((result) => {
                         console.log("Boards Fetched")
@@ -59,41 +57,9 @@ class PickBoard extends Component {
     }
 
     render() {
-        /* Authenticate if we need to */
-        if (!this.isAuthed()) {
-            console.log("Authenticating Trello")
-            return (<TrelloClient
-                apiKey="38e2c9e0bd5f083ac3e8e19ed8a1a5fa" // Get the API key from https://trello.com/app-key/
-                clientVersion={1} // number: {1}, {2}, {3}
-                apiEndpoint="https://api.trello.com" // string: "https://api.trello.com"
-                authEndpoint="https://trello.com" // string: "https://trello.com"
-                intentEndpoint="https://trello.com" // string: "https://trello.com"
-                authorizeName="React Trello Client" // string: "React Trello Client"
-                authorizeType="popup" // string: popup | redirect
-                authorizePersist={true}
-                authorizeInteractive={false}
-                authorizeScopeRead={true} // boolean: {true} | {false}
-                authorizeScopeWrite={true} // boolean: {true} | {false}
-                authorizeScopeAccount={true} // boolean: {true} | {false}
-                authorizeExpiration="never" // string: "1hour", "1day", "30days" | "never"
-                authorizeOnSuccess={() => {
-                    console.log("Authenticated Trello")
-                }}
-                authorizeOnError={() => {
-                    console.log("Failed to auth Trello")
-                }}
-                autoAuthorize={true} // boolean: {true} | {false}
-                authorizeButton={true} // boolean: {true} | {false}
-                buttonStyle="flat" // string: "metamorph" | "flat"
-                buttonColor="grayish-blue" // string: "green" | "grayish-blue" | "light"
-                buttonText="Authenticate" // string: "Login with Trello"
-            />)
-        }
-
-        /* Check if we have a token */
         if (this.state.boards) {
             const boards = this.state.boards.map((board, i) =>
-                (<ListGroup.Item action onClick={this.showModal.bind(this, board, Trello.token())}>
+                (<ListGroup.Item action onClick={this.showModal.bind(this, board)}>
                     {board.name}
                 </ListGroup.Item>)
             );
@@ -104,7 +70,7 @@ class PickBoard extends Component {
                         projectId: this.state.projectId,
                         emailAddress: this.state.emailAddress,
                         chosenBoard: this.state.confirmBoard,
-                        token: Trello.token()
+                        token: this.state.token
                     }
                 }}
                 />)

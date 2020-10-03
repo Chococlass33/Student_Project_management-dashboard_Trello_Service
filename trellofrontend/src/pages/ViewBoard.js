@@ -22,11 +22,13 @@ class ViewBoard extends Component {
         this.state = {
             projectId: undefined,
             boardId: undefined,
-            loaded: false, // We have no data
-            ready: false // We have processed the
+            loaded: false, // Have we got data
+            ready: false, // Have we processed it
+            token: undefined,
         };
         if (this.props.location.state) {
             this.state.projectId = this.props.location.state.projectId
+            this.state.token = this.props.location.state.token
             this.state.boardId = this.props.location.state.integrationId
         }
     }
@@ -38,20 +40,14 @@ class ViewBoard extends Component {
         /* If we haven't already do all our requests */
         if (!this.state.loaded) {
             /* Get the members for the board */
-            this.doRequest(`http://localhost:5002/data/boardMembers/${this.state.boardId}`,
-                'members', {})
-                /* Get how many cards each member is in */
-                .then(data => this.doRequest(`http://localhost:5002/data/cardMembers/${this.state.boardId}`,
-                    'cardMembers', data))
+            this.doRequest(`http://localhost:5002/data/cardMembers/${this.state.boardId}`,
+                'cardMembers', {})
                 /* Get card data */
-                .then(data => this.doRequest(`http://localhost:5002/boards/${this.state.boardId}`,
+                .then(data => this.doRequest(`http://localhost:5002/data/boardDetails/${this.state.boardId}`,
                     'boardData', data))
                 /* Get the size of all the lists */
                 .then(data => this.doRequest(`http://localhost:5002/data/listSizes/${this.state.boardId}`,
                     'listSizes', data))
-                /* Get the information on the lists */
-                .then(data => this.doRequest(`http://localhost:5002/data/boardLists/${this.state.boardId}`,
-                    'lists', data))
                 /* Save this in the state */
                 .then(data => this.setState({...data, ...this.state, loaded: true}))
         }
@@ -64,7 +60,7 @@ class ViewBoard extends Component {
      * @param data The running data object
      */
     doRequest(request, prop, data) {
-        return fetch(request)
+        return fetch(`${request}?token=${this.state.token}`)
             .then(response => response.json())
             .then(response => {
                 let newData = {}
@@ -78,39 +74,6 @@ class ViewBoard extends Component {
             })
     }
 
-    /**
-     * Processes the data returned by the API into being useful for the chart
-     */
-    processMemberChart() {
-        let nameMap = {};
-        for (let member of this.state.members) {
-            nameMap[member.id] = member.fullName
-        }
-        let chartData = []
-        for (let id in this.state.cardMembers) {
-            if (this.state.cardMembers.hasOwnProperty(id)) {
-                chartData.push([nameMap[id], this.state.cardMembers[id]])
-            }
-        }
-        return chartData
-    }
-
-    /**
-     * Processes the data returned by the API into being useful for the chart
-     */
-    processListChart() {
-        let nameMap = {};
-        for (let list of this.state.lists) {
-            nameMap[list.id] = list.name
-        }
-        let chartData = []
-        for (let id in this.state.listSizes) {
-            if (this.state.listSizes.hasOwnProperty(id)) {
-                chartData.push([nameMap[id], this.state.listSizes[id]])
-            }
-        }
-        return chartData
-    }
 
     /**
      * Once the component updates,
@@ -123,8 +86,8 @@ class ViewBoard extends Component {
             this.setState({
                 ...this.state,
                 ready: true,
-                memberAllocations: this.processMemberChart(),
-                listSizes: this.processListChart()
+                cardMembers: this.state.cardMembers.map(entry => [entry.label, entry.value]),
+                listSizes: this.state.listSizes.map(entry => [entry.label, entry.value])
             })
         }
     }
@@ -159,12 +122,13 @@ class ViewBoard extends Component {
                             <Card.Body>
                                 <Card.Title>Basic Information</Card.Title>
                                 <ListGroup variant="flush">
-                                    <ListGroup.Item>Date Created
-                                        - {this.state.boardData.dateCreated}</ListGroup.Item>
-                                    <ListGroup.Item>Number of Members - {this.state.members.length}</ListGroup.Item>
-                                    <ListGroup.Item>Number of Lists - {this.state.lists.length}</ListGroup.Item>
+                                    <ListGroup.Item>Date Last Active
+                                        - {this.state.boardData.dateLastActivity}</ListGroup.Item>
+                                    <ListGroup.Item>Number of Members - {this.state.boardData.memberCount}</ListGroup.Item>
+                                    <ListGroup.Item>Number of Lists - {this.state.boardData.listCount}</ListGroup.Item>
                                 </ListGroup>
-                                <Button target="_blank" className="float-right" href={this.state.boardData.shortLink} varient="primary">View
+                                <Button target="_blank" className="float-right" href={this.state.boardData.shortUrl}
+                                        varient="primary">View
                                     Board</Button>
                                 <Button className="float-left"
                                         href={`/viewHistory?project-id=${this.state.projectId}&trello-id=${this.state.boardId}`}
@@ -184,7 +148,7 @@ class ViewBoard extends Component {
                                     loader={<div>Loading Chart</div>}
                                     data={[
                                         ['Members', 'Num Cards'],
-                                        ...this.state.memberAllocations
+                                        ...this.state.cardMembers
                                     ]}
                                     options={{
                                         title: 'Card Allocation'
