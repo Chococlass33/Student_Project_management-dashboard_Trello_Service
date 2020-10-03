@@ -71,7 +71,7 @@ class BoardHistory extends Component {
 
     componentDidMount() {
         // On mount, load the board and set the state.
-        fetch(`http://localhost:5002/boardHistory/${this.values['trello-id']}`)
+        fetch(`http://localhost:5002/history/${this.values['trello-id']}?`)
             .then((response) => response.json())
             .then((response) =>
                 this.setState({

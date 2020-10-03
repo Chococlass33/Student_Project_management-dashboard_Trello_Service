@@ -48,6 +48,8 @@ class ViewBoard extends Component {
                 /* Get the size of all the lists */
                 .then(data => this.doRequest(`http://localhost:5002/data/listSizes/${this.state.boardId}`,
                     'listSizes', data))
+                .then(data => this.doRequest(`http://localhost:5002/history/${this.state.boardId}`,
+                    'history', data))
                 /* Save this in the state */
                 .then(data => this.setState({...data, ...this.state, loaded: true}))
         }
@@ -131,7 +133,7 @@ class ViewBoard extends Component {
                                         varient="primary">View
                                     Board</Button>
                                 <Button className="float-left"
-                                        href={`/viewHistory?project-id=${this.state.projectId}&trello-id=${this.state.boardId}`}
+                                        href={`/viewHistory?project-id=${this.state.projectId}&trello-id=${this.state.boardId}&token=${this.state.token}`}
                                         varient="primary">View History</Button>
                             </Card.Body>
                         </Card>

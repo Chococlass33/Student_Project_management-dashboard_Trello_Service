@@ -16,26 +16,19 @@ import java.sql.Timestamp;
 public class Action {
     /* Database related fields */
     @Id
-//    @GeneratedValue(strategy = GenerationType.AUTO)
     private String id;
-    @ManyToOne
-    @JoinColumn(name = "idMember", nullable = false)
-    @JsonIgnore
-    private Member member;
+    private String member;
     private String type;
     @Column(columnDefinition = "MEDIUMTEXT")
     private String data;
     private Timestamp dateCreated;
     private Timestamp dateLastModified;
-    @ManyToOne
-    @JoinColumn(name = "idBoard", nullable = false)
-    @JsonIgnore
-    private Board board;
+    private String board;
 
     protected Action() {
     }
 
-    public Action(String id, Board board, Member member, String type, String data, Timestamp dateCreated, Timestamp dateLastModified) {
+    public Action(String id, String board, String member, String type, String data, Timestamp dateCreated, Timestamp dateLastModified) {
         this.id = id;
         this.board = board;
         this.member = member;
@@ -85,11 +78,11 @@ public class Action {
         this.dateLastModified = dateLastModified;
     }
 
-    public Member getMember() {
+    public String getMember() {
         return member;
     }
 
-    public void setMember(Member member) {
+    public void setMember(String member) {
         this.member = member;
     }
 
@@ -105,21 +98,11 @@ public class Action {
                 '}';
     }
 
-    public Board getBoard() {
+    public String getBoard() {
         return board;
     }
 
-    public void setBoard(Board board) {
+    public void setBoard(String board) {
         this.board = board;
-    }
-
-    @JsonProperty
-    public String getMemberId() {
-        return member.getId();
-    }
-
-    @JsonProperty
-    public String getBoardId() {
-        return board.getId();
     }
 }
