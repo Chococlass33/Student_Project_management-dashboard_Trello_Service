@@ -22,11 +22,13 @@ class ViewBoard extends Component {
         this.state = {
             projectId: undefined,
             boardId: undefined,
-            loaded: false, // We have no data
-            ready: false // We have processed the
+            loaded: false, // Have we got data
+            ready: false, // Have we processed it
+            token: undefined,
         };
         if (this.props.location.state) {
             this.state.projectId = this.props.location.state.projectId
+            this.state.token = this.props.location.state.token
             this.state.boardId = this.props.location.state.integrationId
         }
     }
@@ -35,13 +37,14 @@ class ViewBoard extends Component {
      * When the component is mounted, lets make all our api calls
      */
     componentDidMount() {
+        console.log(this.state.token)
         /* If we haven't already do all our requests */
         if (!this.state.loaded) {
             /* Get the members for the board */
             this.doRequest(`http://localhost:5002/data/boardMembers/${this.state.boardId}`,
                 'members', {})
                 /* Get how many cards each member is in */
-                .then(data => this.doRequest(`http://localhost:5002/data/cardMembers/${this.state.boardId}`,
+                .then(data => this.doRequest(`http://localhost:5002/data/cardMembers/${this.state.boardId}?token=${this.state.token}`,
                     'cardMembers', data))
                 /* Get card data */
                 .then(data => this.doRequest(`http://localhost:5002/boards/${this.state.boardId}`,
@@ -64,6 +67,7 @@ class ViewBoard extends Component {
      * @param data The running data object
      */
     doRequest(request, prop, data) {
+        console.log(request)
         return fetch(request)
             .then(response => response.json())
             .then(response => {
@@ -76,23 +80,6 @@ class ViewBoard extends Component {
                 newData[prop] = undefined
                 return {...data, ...newData}
             })
-    }
-
-    /**
-     * Processes the data returned by the API into being useful for the chart
-     */
-    processMemberChart() {
-        let nameMap = {};
-        for (let member of this.state.members) {
-            nameMap[member.id] = member.fullName
-        }
-        let chartData = []
-        for (let id in this.state.cardMembers) {
-            if (this.state.cardMembers.hasOwnProperty(id)) {
-                chartData.push([nameMap[id], this.state.cardMembers[id]])
-            }
-        }
-        return chartData
     }
 
     /**
@@ -123,7 +110,7 @@ class ViewBoard extends Component {
             this.setState({
                 ...this.state,
                 ready: true,
-                memberAllocations: this.processMemberChart(),
+                cardMembers: this.state.cardMembers.map(entry => [entry.label, entry.value]),
                 listSizes: this.processListChart()
             })
         }
@@ -164,7 +151,8 @@ class ViewBoard extends Component {
                                     <ListGroup.Item>Number of Members - {this.state.members.length}</ListGroup.Item>
                                     <ListGroup.Item>Number of Lists - {this.state.lists.length}</ListGroup.Item>
                                 </ListGroup>
-                                <Button target="_blank" className="float-right" href={this.state.boardData.shortLink} varient="primary">View
+                                <Button target="_blank" className="float-right" href={this.state.boardData.shortLink}
+                                        varient="primary">View
                                     Board</Button>
                                 <Button className="float-left"
                                         href={`/viewHistory?project-id=${this.state.projectId}&trello-id=${this.state.boardId}`}
@@ -184,7 +172,7 @@ class ViewBoard extends Component {
                                     loader={<div>Loading Chart</div>}
                                     data={[
                                         ['Members', 'Num Cards'],
-                                        ...this.state.memberAllocations
+                                        ...this.state.cardMembers
                                     ]}
                                     options={{
                                         title: 'Card Allocation'
