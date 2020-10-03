@@ -7,7 +7,6 @@ import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
-import Form from "react-bootstrap/Form";
 
 import queryString from 'query-string';
 
@@ -25,8 +24,6 @@ class BoardHistory extends Component {
             ready: false,
             token: this.values.token,
         };
-        this.handleChange = this.handleChange.bind(this);
-        this.onFormSubmit = this.onFormSubmit.bind(this);
     }
 
     handleChange(date) {
@@ -43,32 +40,29 @@ class BoardHistory extends Component {
             ready: false,
         });
         const finalDate = this.handleDateFormat();
-        fetch(
-            `http://localhost:5002/boardHistory/${this.values['trello-id']}?date=${finalDate}`
-        )
+        fetch(`http://localhost:5002/history/${this.values['trello-id']}?token=${this.state.token}&date=${finalDate}`)
             .then((response) => response.json())
             .then((response) =>
                 this.setState({
-                    loaded: true,
-                    response: response,
+                    ...this.state,
+                    board: response,
                 })
             );
     }
 
     //
-    // // Handles date format for passing through to the backend.
-    // handleDateFormat() {
-    //     let month =
-    //         this.state.startDate.getUTCMonth() + 1 < 10
-    //             ? '0' + (this.state.startDate.getUTCMonth() + 1)
-    //             : this.state.startDate.getUTCMonth() + 1;
-    //     let day =
-    //         this.state.startDate.getUTCDate() < 10
-    //             ? '0' + this.state.startDate.getUTCDate()
-    //             : this.state.startDate.getUTCDate();
-    //     const finalDate = `${month}${day}${this.state.startDate.getUTCFullYear()}`;
-    //     return finalDate;
-    // }
+    // Handles date format for passing through to the backend.
+    handleDateFormat() {
+        let month =
+            this.state.startDate.getUTCMonth() + 1 < 10
+                ? '0' + (this.state.startDate.getUTCMonth() + 1)
+                : this.state.startDate.getUTCMonth() + 1;
+        let day =
+            this.state.startDate.getUTCDate() < 10
+                ? '0' + this.state.startDate.getUTCDate()
+                : this.state.startDate.getUTCDate();
+        return `${this.state.startDate.getUTCFullYear()}-${month}-${day}`;
+    }
 
     componentDidMount() {
         // On mount, load the board and set the state.
@@ -124,16 +118,15 @@ class BoardHistory extends Component {
                     </Row>
                     <Row>
                         <Col>
-                            <Form onSubmit={this.onFormSubmit}>
-                                <DatePicker
-                                    selected={this.state.startDate}
-                                    onChange={this.handleChange}
-                                    name="startDate"
-                                    maxDate={new Date()}
-                                    dateFormat="MM/dd/yyyy"/>
+                            <DatePicker
+                                selected={this.state.startDate}
+                                onChange={this.handleChange.bind(this)}
+                                name="startDate"
+                                maxDate={new Date()}
+                                dateFormat="MM/dd/yyyy"/>
 
-                                <Button variant="primary" className="m-3">Confirm Date </Button>
-                            </Form>
+                            <Button onClick={this.onFormSubmit.bind(this)} variant="primary" className="m-3">
+                                Confirm Date</Button>
                         </Col>
                     </Row>
                     <Row>
@@ -168,7 +161,7 @@ class BoardHistory extends Component {
 
     buildBoard(board) {
         if (board.lists.size === 0) {
-            return (    
+            return (
                 <span className="h3 col">
 					No lists were found!
 					<br/>
@@ -179,10 +172,10 @@ class BoardHistory extends Component {
         return Object.values(board.lists)
             .sort((a, b) => a.pos - b.pos)
             .map(list => (<Col>
-            <b>List: </b> {list.name}
-            <br/>
-            {this.buildList(list)}
-        </Col>))
+                <b>List: </b> {list.name}
+                <br/>
+                {this.buildList(list)}
+            </Col>))
     }
 
     buildList(list) {
