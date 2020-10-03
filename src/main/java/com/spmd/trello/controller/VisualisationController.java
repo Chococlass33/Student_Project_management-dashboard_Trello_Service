@@ -1,10 +1,8 @@
 package com.spmd.trello.controller;
 
 import com.spmd.trello.BadConfig;
-import com.spmd.trello.repositories.BoardRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -118,6 +116,33 @@ public class VisualisationController {
     }
 
     /**
+     * Get the basic details of the board
+     */
+    @GetMapping(path = "/data/boardDetails/{boardId}")
+    ResponseEntity<Board> getBoardDetails(@PathVariable String boardId, @RequestParam String token) {
+        URI url = UriComponentsBuilder.fromHttpUrl("https://api.trello.com/1/boards/" + boardId )
+                .queryParam("key", BadConfig.API_KEY)
+                .queryParam("token", token)
+                .queryParam("fields", "name,dateLastActivity,shortUrl,name")
+                .queryParam("lists", "open")
+                .queryParam("list_fields", "id")
+                .queryParam("members", "all")
+                .queryParam("member_fields", "id")
+                .build().toUri();
+        RestTemplate restTemplate = new RestTemplate();
+        Board board = restTemplate.getForObject(url, Board.class);
+
+        if (board == null) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        board.listCount = board.lists.length;
+        board.memberCount = board.members.length;
+
+        return new ResponseEntity<>(board, HttpStatus.OK);
+    }
+
+    /**
      * An entry in a graph
      *
      * @param <T> The type of the value for the data
@@ -130,6 +155,20 @@ public class VisualisationController {
             this.label = label;
             this.value = value;
         }
+    }
+
+    /**
+     * A trello board
+     */
+    private static class Board {
+        public String dateLastActivity;
+        public String shortUrl;
+        public TrelloList[] lists;
+        public Member[] members;
+        public String name;
+
+        public int memberCount;
+        public int listCount;
     }
 
     /**
@@ -153,6 +192,7 @@ public class VisualisationController {
      * The member data returned form trello
      */
     private static class Member {
+        public String id;
         public MemberDetails member;
 
         private static class MemberDetails {
@@ -160,5 +200,4 @@ public class VisualisationController {
             public String id;
         }
     }
-
 }
