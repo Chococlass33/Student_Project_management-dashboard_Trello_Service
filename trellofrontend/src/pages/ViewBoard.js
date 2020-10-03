@@ -50,7 +50,7 @@ class ViewBoard extends Component {
                 .then(data => this.doRequest(`http://localhost:5002/boards/${this.state.boardId}`,
                     'boardData', data))
                 /* Get the size of all the lists */
-                .then(data => this.doRequest(`http://localhost:5002/data/listSizes/${this.state.boardId}`,
+                .then(data => this.doRequest(`http://localhost:5002/data/listSizes/${this.state.boardId}?token=${this.state.token}`,
                     'listSizes', data))
                 /* Get the information on the lists */
                 .then(data => this.doRequest(`http://localhost:5002/data/boardLists/${this.state.boardId}`,
@@ -82,22 +82,6 @@ class ViewBoard extends Component {
             })
     }
 
-    /**
-     * Processes the data returned by the API into being useful for the chart
-     */
-    processListChart() {
-        let nameMap = {};
-        for (let list of this.state.lists) {
-            nameMap[list.id] = list.name
-        }
-        let chartData = []
-        for (let id in this.state.listSizes) {
-            if (this.state.listSizes.hasOwnProperty(id)) {
-                chartData.push([nameMap[id], this.state.listSizes[id]])
-            }
-        }
-        return chartData
-    }
 
     /**
      * Once the component updates,
@@ -111,7 +95,7 @@ class ViewBoard extends Component {
                 ...this.state,
                 ready: true,
                 cardMembers: this.state.cardMembers.map(entry => [entry.label, entry.value]),
-                listSizes: this.processListChart()
+                listSizes: this.state.listSizes.map(entry => [entry.label, entry.value])
             })
         }
     }
