@@ -37,24 +37,17 @@ class ViewBoard extends Component {
      * When the component is mounted, lets make all our api calls
      */
     componentDidMount() {
-        console.log(this.state.token)
         /* If we haven't already do all our requests */
         if (!this.state.loaded) {
             /* Get the members for the board */
-            this.doRequest(`http://localhost:5002/data/boardMembers/${this.state.boardId}`,
-                'members', {})
-                /* Get how many cards each member is in */
-                .then(data => this.doRequest(`http://localhost:5002/data/cardMembers/${this.state.boardId}?token=${this.state.token}`,
-                    'cardMembers', data))
+            this.doRequest(`http://localhost:5002/data/cardMembers/${this.state.boardId}`,
+                'cardMembers', {})
                 /* Get card data */
-                .then(data => this.doRequest(`http://localhost:5002/boards/${this.state.boardId}`,
+                .then(data => this.doRequest(`http://localhost:5002/data/boardDetails/${this.state.boardId}`,
                     'boardData', data))
                 /* Get the size of all the lists */
-                .then(data => this.doRequest(`http://localhost:5002/data/listSizes/${this.state.boardId}?token=${this.state.token}`,
+                .then(data => this.doRequest(`http://localhost:5002/data/listSizes/${this.state.boardId}`,
                     'listSizes', data))
-                /* Get the information on the lists */
-                .then(data => this.doRequest(`http://localhost:5002/data/boardLists/${this.state.boardId}`,
-                    'lists', data))
                 /* Save this in the state */
                 .then(data => this.setState({...data, ...this.state, loaded: true}))
         }
@@ -67,8 +60,7 @@ class ViewBoard extends Component {
      * @param data The running data object
      */
     doRequest(request, prop, data) {
-        console.log(request)
-        return fetch(request)
+        return fetch(`${request}?token=${this.state.token}`)
             .then(response => response.json())
             .then(response => {
                 let newData = {}
@@ -130,12 +122,12 @@ class ViewBoard extends Component {
                             <Card.Body>
                                 <Card.Title>Basic Information</Card.Title>
                                 <ListGroup variant="flush">
-                                    <ListGroup.Item>Date Created
-                                        - {this.state.boardData.dateCreated}</ListGroup.Item>
-                                    <ListGroup.Item>Number of Members - {this.state.members.length}</ListGroup.Item>
-                                    <ListGroup.Item>Number of Lists - {this.state.lists.length}</ListGroup.Item>
+                                    <ListGroup.Item>Date Last Active
+                                        - {this.state.boardData.dateLastActivity}</ListGroup.Item>
+                                    <ListGroup.Item>Number of Members - {this.state.boardData.memberCount}</ListGroup.Item>
+                                    <ListGroup.Item>Number of Lists - {this.state.boardData.listCount}</ListGroup.Item>
                                 </ListGroup>
-                                <Button target="_blank" className="float-right" href={this.state.boardData.shortLink}
+                                <Button target="_blank" className="float-right" href={this.state.boardData.shortUrl}
                                         varient="primary">View
                                     Board</Button>
                                 <Button className="float-left"
