@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Date;
+import java.util.Map;
 
 /**
  * Represents an action POSTEed to the webhook
@@ -80,7 +81,7 @@ public class WebhookAction {
          * This is currently just a plain object because we don't actually care about it right now,
          * as it gets stored in the DB as a plain string anyway
          */
-        public Object data;
+        public ActionData data;
         public Date date;
         public String idMemberCreator;
         /**
@@ -109,5 +110,9 @@ public class WebhookAction {
                 return data.toString();
             }
         }
+    }
+
+    private static class ActionData {
+        public Map<String, String> old;
     }
 }

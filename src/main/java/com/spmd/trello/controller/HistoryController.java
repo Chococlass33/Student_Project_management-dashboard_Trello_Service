@@ -1,6 +1,7 @@
 package com.spmd.trello.controller;
 
 import com.spmd.trello.BadConfig;
+import com.spmd.trello.model.Action;
 import com.spmd.trello.repositories.ActionRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,9 +20,11 @@ import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 public class HistoryController {
@@ -60,10 +63,12 @@ public class HistoryController {
         }
 
         /* Get all the actions filtered by date */
-        Date date;
-        date = java.sql.Date.valueOf(rawDate.get());
+        Date date = Date.valueOf(rawDate.get());
+        List<Action> actions = actionRepository.findAllByBoard(boardId);
+        actions = actions.stream().filter(action -> action.getDateCreated().after(date)).collect(Collectors.toList());
 
-        actionRepository.findAllByBoardAndDateCreated(boardId, date);
+        
+
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
