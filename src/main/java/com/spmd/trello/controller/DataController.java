@@ -30,25 +30,25 @@ class DataController {
         this.boardRepo = boardRepo;
     }
 
-    @GetMapping(path = "/data/cardMembers/{boardId}")
-    Map<String, Integer> getAllMembers(@PathVariable String boardId) {
-        logger.info("Getting card memberships for board " + boardId);
-        Optional<Board> boardSearch = boardRepo.findById(boardId);
-        if (boardSearch.isEmpty()) {
-            return null;
-        }
-        Board board = boardSearch.get();
-        Set<CardMember> cardMembers = board.getCards()
-                .stream()
-                .flatMap(card -> card.getCardMembers().stream())
-                .collect(Collectors.toSet());
-        Map<String, Integer> cardCount = new HashMap<>();
-        for (CardMember cardMember : cardMembers) {
-            String id = cardMember.getMember().getId();
-            cardCount.put(id, cardCount.getOrDefault(id, 0) + 1);
-        }
-        return cardCount;
-    }
+//    @GetMapping(path = "/data/cardMembers/{boardId}")
+//    Map<String, Integer> getAllMembers(@PathVariable String boardId) {
+//        logger.info("Getting card memberships for board " + boardId);
+//        Optional<Board> boardSearch = boardRepo.findById(boardId);
+//        if (boardSearch.isEmpty()) {
+//            return null;
+//        }
+//        Board board = boardSearch.get();
+//        Set<CardMember> cardMembers = board.getCards()
+//                .stream()
+//                .flatMap(card -> card.getCardMembers().stream())
+//                .collect(Collectors.toSet());
+//        Map<String, Integer> cardCount = new HashMap<>();
+//        for (CardMember cardMember : cardMembers) {
+//            String id = cardMember.getMember().getId();
+//            cardCount.put(id, cardCount.getOrDefault(id, 0) + 1);
+//        }
+//        return cardCount;
+//    }
 
     @GetMapping(path = "/data/boardMembers/{boardId}")
     Iterable<Member> getBoardMember(@PathVariable String boardId) {
