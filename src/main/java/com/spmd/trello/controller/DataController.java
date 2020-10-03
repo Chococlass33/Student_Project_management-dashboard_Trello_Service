@@ -56,14 +56,14 @@ class DataController {
                 .map(BoardMembership::getMember).collect(Collectors.toList());
     }
 
-    @GetMapping(path = "/data/listSizes/{boardId}")
-    Map<String, Integer> getListSize(@PathVariable String boardId) {
-        Map<String, Integer> cardCount = new HashMap<>();
-        boardRepo.findById(boardId).stream() // Get the board
-                .flatMap(board -> board.getLists().stream()) // Get all the lists
-                .forEach(list -> cardCount.put(list.getId(), list.getCards().size())); // Insert the size of this list
-        return cardCount;
-    }
+//    @GetMapping(path = "/data/listSizes/{boardId}")
+//    Map<String, Integer> getListSize(@PathVariable String boardId) {
+//        Map<String, Integer> cardCount = new HashMap<>();
+//        boardRepo.findById(boardId).stream() // Get the board
+//                .flatMap(board -> board.getLists().stream()) // Get all the lists
+//                .forEach(list -> cardCount.put(list.getId(), list.getCards().size())); // Insert the size of this list
+//        return cardCount;
+//    }
 
     @GetMapping(path = "/data/boardLists/{boardId}")
     Iterable<List> getBoardLists(@PathVariable String boardId) {
