@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,6 +34,19 @@ public class WebhookController {
     private static final Logger logger = LoggerFactory.getLogger(WebhookController.class);
     @Autowired
     private ActionRepository actionRepository;
+
+    /**
+     * Handles the initial HEAD request from trello to check if the webhook is active
+     * A HEAD request can also be handled by GET, making things simpler.
+     * <p>
+     * Just returns a 200 response code.
+     */
+    @GetMapping
+    public @ResponseBody
+    String checkCallback() {
+        logger.info("Got Trello Request");
+        return "";
+    }
 
     /**
      * Handles a request to make a new webhook for the given model.
