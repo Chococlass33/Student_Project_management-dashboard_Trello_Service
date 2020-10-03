@@ -23,6 +23,7 @@ class BoardHistory extends Component {
             finalDate: new Date(),
             loaded: false,
             ready: false,
+            token: this.values.token,
         };
         this.handleChange = this.handleChange.bind(this);
         this.onFormSubmit = this.onFormSubmit.bind(this);
@@ -49,36 +50,37 @@ class BoardHistory extends Component {
             .then((response) =>
                 this.setState({
                     loaded: true,
-                    board: response.board,
-                    lists: response.lists,
+                    response: response,
                 })
             );
     }
 
-    // Handles date format for passing through to the backend.
-    handleDateFormat() {
-        let month =
-            this.state.startDate.getUTCMonth() + 1 < 10
-                ? '0' + (this.state.startDate.getUTCMonth() + 1)
-                : this.state.startDate.getUTCMonth() + 1;
-        let day =
-            this.state.startDate.getUTCDate() < 10
-                ? '0' + this.state.startDate.getUTCDate()
-                : this.state.startDate.getUTCDate();
-        const finalDate = `${month}${day}${this.state.startDate.getUTCFullYear()}`;
-        return finalDate;
-    }
+    //
+    // // Handles date format for passing through to the backend.
+    // handleDateFormat() {
+    //     let month =
+    //         this.state.startDate.getUTCMonth() + 1 < 10
+    //             ? '0' + (this.state.startDate.getUTCMonth() + 1)
+    //             : this.state.startDate.getUTCMonth() + 1;
+    //     let day =
+    //         this.state.startDate.getUTCDate() < 10
+    //             ? '0' + this.state.startDate.getUTCDate()
+    //             : this.state.startDate.getUTCDate();
+    //     const finalDate = `${month}${day}${this.state.startDate.getUTCFullYear()}`;
+    //     return finalDate;
+    // }
 
     componentDidMount() {
         // On mount, load the board and set the state.
-        fetch(`http://localhost:5002/history/${this.values['trello-id']}?`)
-            .then((response) => response.json())
-            .then((response) =>
+        fetch(`http://localhost:5002/history/${this.values['trello-id']}?token=${this.state.token}`)
+            .then(response => response.json())
+            .then(response =>
                 this.setState({
-                    loaded: true,
-                    board: response.board,
-                    lists: response.lists,
-                })
+                        ...this.state,
+                        loaded: true,
+                        board: response
+                    }
+                )
             );
     }
 
@@ -143,7 +145,7 @@ class BoardHistory extends Component {
                     </Row>
                     <Container fluid>
                         <Row style={{flexWrap: "nowrap"}}>
-                            {this.buildLists(this.state.lists)}
+                            {this.buildBoard(this.state.board)}
                         </Row>
                     </Container>
                 </Container>
@@ -164,23 +166,9 @@ class BoardHistory extends Component {
         });
     };
 
-    // Build a list that is column separated based on the number of lists on the board. This will need rework when list size is large (probably a scrollbar or something).
-    /**
-     * Convert multiple lists into visual representations.
-     * Relies on the buildCards method to convert all the cards in a list into visual cards
-     * @param lists The lists to convert
-     */
-    buildLists(lists) {
-        if (lists.length > 0) {
-            return lists.map(list => (
-                <Col>
-                    <b>List: </b> {list.list.name}
-                    <br/>
-                    {this.buildCards(list)}
-                </Col>
-            ));
-        } else {
-            return (
+    buildBoard(board) {
+        if (board.lists.size === 0) {
+            return (    
                 <span className="h3 col">
 					No lists were found!
 					<br/>
@@ -188,28 +176,32 @@ class BoardHistory extends Component {
 				</span>
             );
         }
+        return Object.values(board.lists)
+            .sort((a, b) => a.pos - b.pos)
+            .map(list => (<Col>
+            <b>List: </b> {list.name}
+            <br/>
+            {this.buildList(list)}
+        </Col>))
     }
 
-    // Build a column of cards, which is called per list.
-    /**
-     * Produce a visual representation of all the cards in a list
-     * @param list The list to convert
-     */
-    buildCards(list) {
-        return list.cards.map((card) => (
-            <Card key={card.id} className="m-2" style={{width: '17rem', height: '13rem'}}>
-                <Card.Body>
-                    <Card.Title>{card.name}</Card.Title>
-                    <Card.Text>
-                        {this.handleCardDescription(card.description)}
-                    </Card.Text>
-                </Card.Body>
-                <Card.Footer>
-                    <Card.Link href="#">View members</Card.Link>
-                    <Card.Link href="#">View details</Card.Link>
-                </Card.Footer>
-            </Card>
-        ));
+    buildList(list) {
+        return Object.values(list.cards)
+            .sort((a, b) => a.pos - b.pos)
+            .map(card => (
+                <Card key={card.id} className="m-2" style={{width: '17rem', height: '13rem'}}>
+                    <Card.Body>
+                        <Card.Title>{card.name}</Card.Title>
+                        <Card.Text>
+                            {this.handleCardDescription(card.desc)}
+                        </Card.Text>
+                    </Card.Body>
+                    <Card.Footer>
+                        <Card.Link href="#">View members</Card.Link>
+                        <Card.Link href="#">View details</Card.Link>
+                    </Card.Footer>
+                </Card>
+            ))
     }
 
     /**
@@ -227,6 +219,7 @@ class BoardHistory extends Component {
             return description;
         }
     }
+
 }
 
 export default BoardHistory;

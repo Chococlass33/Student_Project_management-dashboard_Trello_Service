@@ -17,7 +17,10 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -33,7 +36,7 @@ public class HistoryController {
     }
 
     @GetMapping("/history/{boardId}")
-    ResponseEntity<Board> boardHistory(@PathVariable String boardId, @RequestParam String token, @RequestParam("date") Optional<String> rawDate) {
+    ResponseEntity<TrelloBoard> boardHistory(@PathVariable String boardId, @RequestParam String token, @RequestParam("date") Optional<String> rawDate) {
         /* Get the current state of the board */
         URI url = UriComponentsBuilder.fromHttpUrl("https://api.trello.com/1/boards/" + boardId)
                 .queryParam("key", BadConfig.API_KEY)
@@ -43,12 +46,13 @@ public class HistoryController {
                 .queryParam("cards", "open")
                 .build().toUri();
         RestTemplate restTemplate = new RestTemplate();
-        Board board = restTemplate.getForObject(url, Board.class);
+        RawBoard rawBoard = restTemplate.getForObject(url, RawBoard.class);
 
         /* Check we have a board */
-        if (board == null) {
+        if (rawBoard == null) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+        TrelloBoard board = new TrelloBoard(rawBoard);
 
         /* If the date is empty, we can just return this state of the board */
         if (rawDate.isEmpty()) {
@@ -63,23 +67,68 @@ public class HistoryController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    private static class Board {
+    private static class TrelloBoard {
         public String name;
-        public Card[] cards;
-        public TrelloList[] lists;
+        public Map<String, TrelloList> lists = new HashMap<>();
+
+        public TrelloBoard(RawBoard rawBoard) {
+            name = rawBoard.name;
+            for (RawBoard.RawList rawList : rawBoard.lists) {
+                lists.put(rawList.id, new TrelloList(rawList, rawBoard.cards));
+            }
+        }
+
+        private static class TrelloList {
+            public String id;
+            public String name;
+            public float pos;
+            public Map<String, TrelloCard> cards = new HashMap<>();
+
+            public TrelloList(RawBoard.RawList rawList, RawBoard.RawCard[] rawCards) {
+                id = rawList.id;
+                name = rawList.name;
+                pos = rawList.pos;
+                Arrays.stream(rawCards)
+                        .filter(rawCard -> rawCard.idList.equals(id))
+                        .forEach(rawCard -> cards.put(rawCard.id, new TrelloCard(rawCard)));
+            }
+
+            private static class TrelloCard {
+                public String id;
+                public String desc;
+                public String name;
+                public float pos;
+
+                public TrelloCard(RawBoard.RawCard rawCard) {
+                    id = rawCard.id;
+                    desc = rawCard.desc;
+                    name = rawCard.name;
+                    pos = rawCard.pos;
+                }
+            }
+        }
+
     }
 
-    private static class Card {
-        public String id;
-        public String desc;
-        public String idList;
+    private static class RawBoard {
         public String name;
-        public float pos;
+        public RawCard[] cards;
+        public RawList[] lists;
+
+        private static class RawCard {
+            public String id;
+            public String desc;
+            public String idList;
+            public String name;
+            public float pos;
+        }
+
+        private static class RawList {
+            public String id;
+            public String name;
+            public float pos;
+        }
     }
 
-    private static class TrelloList {
-        public String id;
-        public String name;
-        public float pos;
-    }
+
 }
