@@ -1,14 +1,10 @@
 package com.spmd.trello.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import java.sql.Timestamp;
 
 @Entity
@@ -22,20 +18,18 @@ public class Action {
     @Column(columnDefinition = "MEDIUMTEXT")
     private String data;
     private Timestamp dateCreated;
-    private Timestamp dateLastModified;
     private String board;
 
     protected Action() {
     }
 
-    public Action(String id, String board, String member, String type, String data, Timestamp dateCreated, Timestamp dateLastModified) {
+    public Action(String id, String board, String member, String type, String data, Timestamp dateCreated) {
         this.id = id;
         this.board = board;
         this.member = member;
         this.type = type;
         this.data = data;
         this.dateCreated = dateCreated;
-        this.dateLastModified = dateLastModified;
     }
 
     public String getId() {
@@ -70,14 +64,6 @@ public class Action {
         this.dateCreated = dateCreated;
     }
 
-    public Timestamp getDateLastModified() {
-        return dateLastModified;
-    }
-
-    public void setDateLastModified(Timestamp dateLastModified) {
-        this.dateLastModified = dateLastModified;
-    }
-
     public String getMember() {
         return member;
     }
@@ -94,7 +80,6 @@ public class Action {
                 ", type='" + type + '\'' +
                 ", data='" + data + '\'' +
                 ", dateCreated=" + dateCreated +
-                ", dateLastModified=" + dateLastModified +
                 '}';
     }
 

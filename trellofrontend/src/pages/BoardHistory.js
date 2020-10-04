@@ -45,6 +45,7 @@ class BoardHistory extends Component {
             .then((response) =>
                 this.setState({
                     ...this.state,
+                    loaded: true,
                     board: response,
                 })
             );

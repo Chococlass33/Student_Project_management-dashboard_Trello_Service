@@ -114,5 +114,13 @@ public class WebhookAction {
 
     private static class ActionData {
         public Map<String, String> old;
+        public IdObject card;
+        public IdObject listAfter;
+        public IdObject board;
+        public IdObject list;
+
+        private static class IdObject {
+            public String id;
+        }
     }
 }
