@@ -67,7 +67,6 @@ public class HistoryController {
         Date date = Date.valueOf(rawDate.get());
         List<Action> actions = actionRepository.findAllByBoard(boardId);
         actions = actions.stream().filter(action -> action.getDateCreated().after(date))
-                .filter(action -> action.getType().equals("updateCard"))
                 .sorted(Comparator.comparing(Action::getDateCreated).reversed())
                 .collect(Collectors.toList());
 
@@ -76,49 +75,90 @@ public class HistoryController {
         return new ResponseEntity<>(board, HttpStatus.OK);
     }
 
+    /**
+     * Process each action in turn
+     * An action must be _undone_.
+     * eg, creating a card means it should be deleted from the board
+     *
+     * @param board   The board to manipulate
+     * @param actions The list of actions to process
+     */
     private void processActions(TrelloBoard board, List<Action> actions) {
+        logger.info("Processing for board: " + board.name);
         for (Action action : actions) {
             JsonObject root = JsonParser.parseString(action.getData()).getAsJsonObject();
-            if (!root.has("card") || !root.has("list")) {
-                // We don't know what card was affected
-                continue;
+            logger.info(action.getType());
+            switch (action.getType()) {
+                case "updateCard":
+                    processUpdateCard(board, root);
+                    break;
+                case "createCard":
+                    processCreateCard(board, root);
+                    break;
+                default:
+                    logger.error("unknown action type");
             }
-            String cardId = root.getAsJsonObject("card").get("id").getAsString();
-            String listId;
-            if (!root.get("list").isJsonNull()) {
-                listId = root.getAsJsonObject("list").get("id").getAsString();
-            } else if (!root.get("listAfter").isJsonNull()) {
-                listId = root.getAsJsonObject("listAfter").get("id").getAsString();
-            } else {
-                logger.error("Unable to find list id");
-                continue;
-            }
+        }
+        logger.info("done\n");
+    }
 
-            JsonObject actionData = root.getAsJsonObject("old");
-            Set<String> keys = actionData.keySet();
+    /**
+     * A card was created
+     * So we need to delete it
+     *
+     * @param board The board to modify
+     * @param root  The data containing the details
+     */
+    private void processCreateCard(TrelloBoard board, JsonObject root) {
+        String cardId = root.getAsJsonObject("card").get("id").getAsString();
+        String listId = root.getAsJsonObject("list").get("id").getAsString();
+        board.lists.get(listId).cards.remove(cardId);
+    }
 
-            TrelloCard card = board.lists.get(listId).cards.get(cardId);
-            for (String key : keys) {
-                logger.info("Key: " + key + " Val: " + actionData.get(key).getAsString());
-                switch (key) {
-                    case "pos":
-                        card.pos = actionData.get(key).getAsFloat();
-                        break;
-                    case "name":
-                        card.name = actionData.get(key).getAsString();
-                        break;
-                    case "desc":
-                        card.desc = actionData.get(key).getAsString();
-                        break;
-                    case "idList":
-                        TrelloList priorList = board.lists.get(actionData.get(key).getAsString());
-                        TrelloList currentList = board.lists.get(listId);
-                        priorList.cards.put(card.id, card);
-                        currentList.cards.remove(card.id);
-                        break;
-                    default:
-                        break;
-                }
+    /**
+     * A card was updated
+     *
+     * @param board The board to modify
+     * @param root  The data containing the details
+     */
+    private void processUpdateCard(TrelloBoard board, JsonObject root) {
+        String cardId = root.getAsJsonObject("card").get("id").getAsString();
+        String listId;
+        if (!root.get("list").isJsonNull()) {
+            listId = root.getAsJsonObject("list").get("id").getAsString();
+        } else if (!root.get("listAfter").isJsonNull()) {
+            listId = root.getAsJsonObject("listAfter").get("id").getAsString();
+        } else {
+            logger.error("Unable to find list id");
+            return;
+        }
+
+        JsonObject actionData = root.getAsJsonObject("old");
+        Set<String> keys = actionData.keySet();
+
+        TrelloCard card = board.lists.get(listId).cards.get(cardId);
+        for (String key : keys) {
+            switch (key) {
+                case "pos":
+                    card.pos = actionData.get(key).getAsFloat();
+                    break;
+                case "name":
+                    card.name = actionData.get(key).getAsString();
+                    break;
+                case "desc":
+                    card.desc = actionData.get(key).getAsString();
+                    break;
+                case "idList":
+                    TrelloList priorList = board.lists.get(actionData.get(key).getAsString());
+                    TrelloList currentList = board.lists.get(listId);
+                    priorList.cards.put(card.id, card);
+                    currentList.cards.remove(card.id);
+                    break;
+                case "closed":
+                    break;
+                default:
+                    logger.info("unknown data field: " + key);
+                    break;
             }
         }
     }
