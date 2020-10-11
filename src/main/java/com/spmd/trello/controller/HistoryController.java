@@ -47,7 +47,7 @@ public class HistoryController {
                 .queryParam("token", token)
                 .queryParam("fields", "name,dateLastActivity,shortUrl,name")
                 .queryParam("lists", "open")
-                .queryParam("cards", "open")
+                .queryParam("cards", "all")
                 .build().toUri();
         RestTemplate restTemplate = new RestTemplate();
         RawBoard rawBoard = restTemplate.getForObject(url, RawBoard.class);
@@ -60,7 +60,7 @@ public class HistoryController {
 
         /* If the date is empty, we can just return this state of the board */
         if (rawDate.isEmpty()) {
-            return ResponseEntity.ok(board);
+            return ResponseEntity.ok(board.removeClosedCards());
         }
 
         /* Get all the actions filtered by date */
@@ -72,7 +72,7 @@ public class HistoryController {
 
         processActions(board, actions);
 
-        return new ResponseEntity<>(board, HttpStatus.OK);
+        return ResponseEntity.ok(board.removeClosedCards());
     }
 
     /**
@@ -95,11 +95,29 @@ public class HistoryController {
                 case "createCard":
                     processCreateCard(board, root);
                     break;
+                case "deleteCard":
+                    processDeleteCard(board, root);
                 default:
                     logger.error("unknown action type");
             }
         }
         logger.info("done\n");
+    }
+
+    /**
+     * A card was deleted
+     * So we need to create it
+     *
+     * @param board The board to modify
+     * @param root  The data
+     */
+    private void processDeleteCard(TrelloBoard board, JsonObject root) {
+        String cardId = root.getAsJsonObject("card").get("id").getAsString();
+        String listId = root.getAsJsonObject("list").get("id").getAsString();
+        TrelloList list = board.lists.get(listId);
+        // We don;t have any data, so we have to put in defaults
+        TrelloCard newCard = new TrelloCard(cardId, "", "", 0, true);
+        list.cards.put(cardId, newCard);
     }
 
     /**
@@ -139,22 +157,23 @@ public class HistoryController {
         TrelloCard card = board.lists.get(listId).cards.get(cardId);
         for (String key : keys) {
             switch (key) {
-                case "pos":
+                case "pos": // Card moved in a list
                     card.pos = actionData.get(key).getAsFloat();
                     break;
-                case "name":
+                case "name": // Card name changed
                     card.name = actionData.get(key).getAsString();
                     break;
-                case "desc":
+                case "desc": // Card description changed
                     card.desc = actionData.get(key).getAsString();
                     break;
-                case "idList":
+                case "idList": // Card moved from one list to another
                     TrelloList priorList = board.lists.get(actionData.get(key).getAsString());
                     TrelloList currentList = board.lists.get(listId);
                     priorList.cards.put(card.id, card);
                     currentList.cards.remove(card.id);
                     break;
-                case "closed":
+                case "closed": // Card was closed/opened
+                    card.closed = actionData.get(key).getAsBoolean();
                     break;
                 default:
                     logger.info("unknown data field: " + key);
@@ -175,6 +194,13 @@ public class HistoryController {
             for (RawBoard.RawList rawList : rawBoard.lists) {
                 lists.put(rawList.id, new TrelloList(rawList, rawBoard.cards));
             }
+        }
+
+        TrelloBoard removeClosedCards() {
+            lists.values() // Get each of the lists
+                    .forEach(list -> list.cards.values() //  Get the cards in the list
+                            .removeIf(trelloCard -> trelloCard.closed)); // Remove them from the list if they are closed
+            return this;
         }
     }
 
@@ -205,12 +231,22 @@ public class HistoryController {
         public String desc;
         public String name;
         public float pos;
+        public boolean closed;
+
+        public TrelloCard(String id, String desc, String name, float pos, boolean closed) {
+            this.id = id;
+            this.desc = desc;
+            this.name = name;
+            this.pos = pos;
+            this.closed = closed;
+        }
 
         public TrelloCard(RawBoard.RawCard rawCard) {
             id = rawCard.id;
             desc = rawCard.desc;
             name = rawCard.name;
             pos = rawCard.pos;
+            closed = rawCard.closed;
         }
     }
 
@@ -232,6 +268,7 @@ public class HistoryController {
             public String idList;
             public String name;
             public float pos;
+            public boolean closed;
         }
 
         /**
