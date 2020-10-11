@@ -97,11 +97,54 @@ public class HistoryController {
                     break;
                 case "deleteCard":
                     processDeleteCard(board, root);
+
+                case "updateList":
+                    processUpdateList(board, root);
+                case "createList":
+                    processCreateList(board, root);
                 default:
                     logger.error("unknown action type");
             }
         }
         logger.info("done\n");
+    }
+
+    /**
+     * A list was created, so we need to delete it
+     *
+     * @param board The board to modify
+     * @param root  The data
+     */
+    private void processCreateList(TrelloBoard board, JsonObject root) {
+        String listId = root.getAsJsonObject("list").get("id").getAsString();
+        board.lists.remove(listId);
+    }
+
+    /**
+     * A list has been updated
+     *
+     * @param board The board to modify
+     * @param root  The data
+     */
+    private void processUpdateList(TrelloBoard board, JsonObject root) {
+        String listId = root.getAsJsonObject("list").get("id").getAsString();
+        TrelloList list = board.lists.get(listId);
+
+        JsonObject actionData = root.getAsJsonObject("old");
+        Set<String> keys = actionData.keySet();
+        for (String key : keys) {
+            switch (key) {
+                case "pos": // List position changed
+                    list.pos = actionData.get(key).getAsFloat();
+                    break;
+                case "name": // List name changed
+                    list.name = actionData.get(key).getAsString();
+                    break;
+                default: // Unknown field
+                    logger.info("unknown data field: " + key);
+                    break;
+            }
+        }
     }
 
     /**
