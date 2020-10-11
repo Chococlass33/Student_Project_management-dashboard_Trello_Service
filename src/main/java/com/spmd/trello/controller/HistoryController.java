@@ -46,7 +46,7 @@ public class HistoryController {
                 .queryParam("key", BadConfig.API_KEY)
                 .queryParam("token", token)
                 .queryParam("fields", "name,dateLastActivity,shortUrl,name")
-                .queryParam("lists", "open")
+                .queryParam("lists", "all")
                 .queryParam("cards", "all")
                 .build().toUri();
         RestTemplate restTemplate = new RestTemplate();
@@ -60,7 +60,7 @@ public class HistoryController {
 
         /* If the date is empty, we can just return this state of the board */
         if (rawDate.isEmpty()) {
-            return ResponseEntity.ok(board.removeClosedCards());
+            return ResponseEntity.ok(board.removeClosed());
         }
 
         /* Get all the actions filtered by date */
@@ -72,7 +72,7 @@ public class HistoryController {
 
         processActions(board, actions);
 
-        return ResponseEntity.ok(board.removeClosedCards());
+        return ResponseEntity.ok(board.removeClosed());
     }
 
     /**
@@ -92,16 +92,20 @@ public class HistoryController {
                 case "updateCard":
                     processUpdateCard(board, root);
                     break;
+                case "copyCard":
                 case "createCard":
                     processCreateCard(board, root);
                     break;
                 case "deleteCard":
                     processDeleteCard(board, root);
+                    break;
 
                 case "updateList":
                     processUpdateList(board, root);
+                    break;
                 case "createList":
                     processCreateList(board, root);
+                    break;
                 default:
                     logger.error("unknown action type");
             }
@@ -133,10 +137,13 @@ public class HistoryController {
         JsonObject actionData = root.getAsJsonObject("old");
         Set<String> keys = actionData.keySet();
         for (String key : keys) {
+            logger.info(key);
             switch (key) {
                 case "pos": // List position changed
                     list.pos = actionData.get(key).getAsFloat();
                     break;
+                case "closed": // List was closed/opened
+                    list.closed = actionData.get(key).getAsBoolean();
                 case "name": // List name changed
                     list.name = actionData.get(key).getAsString();
                     break;
@@ -199,6 +206,7 @@ public class HistoryController {
 
         TrelloCard card = board.lists.get(listId).cards.get(cardId);
         for (String key : keys) {
+            logger.info(key);
             switch (key) {
                 case "pos": // Card moved in a list
                     card.pos = actionData.get(key).getAsFloat();
@@ -239,7 +247,8 @@ public class HistoryController {
             }
         }
 
-        TrelloBoard removeClosedCards() {
+        TrelloBoard removeClosed() {
+            lists.values().removeIf(list -> list.closed);// Remove the closed lists
             lists.values() // Get each of the lists
                     .forEach(list -> list.cards.values() //  Get the cards in the list
                             .removeIf(trelloCard -> trelloCard.closed)); // Remove them from the list if they are closed
@@ -254,12 +263,14 @@ public class HistoryController {
         public String id;
         public String name;
         public float pos;
+        public boolean closed;
         public Map<String, TrelloCard> cards = new HashMap<>();
 
         public TrelloList(RawBoard.RawList rawList, RawBoard.RawCard[] rawCards) {
             id = rawList.id;
             name = rawList.name;
             pos = rawList.pos;
+            closed = rawList.closed;
             Arrays.stream(rawCards)
                     .filter(rawCard -> rawCard.idList.equals(id))
                     .forEach(rawCard -> cards.put(rawCard.id, new TrelloCard(rawCard)));
@@ -319,6 +330,7 @@ public class HistoryController {
          */
         private static class RawList {
             public String id;
+            public boolean closed;
             public String name;
             public float pos;
         }
