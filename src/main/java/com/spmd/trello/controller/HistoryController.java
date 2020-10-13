@@ -46,8 +46,8 @@ public class HistoryController {
                 .queryParam("key", BadConfig.API_KEY)
                 .queryParam("token", token)
                 .queryParam("fields", "name,dateLastActivity,shortUrl,name")
-                .queryParam("lists", "open")
-                .queryParam("cards", "open")
+                .queryParam("lists", "all")
+                .queryParam("cards", "all")
                 .build().toUri();
         RestTemplate restTemplate = new RestTemplate();
         RawBoard rawBoard = restTemplate.getForObject(url, RawBoard.class);
@@ -60,7 +60,7 @@ public class HistoryController {
 
         /* If the date is empty, we can just return this state of the board */
         if (rawDate.isEmpty()) {
-            return ResponseEntity.ok(board);
+            return ResponseEntity.ok(board.removeClosed());
         }
 
         /* Get all the actions filtered by date */
@@ -72,7 +72,7 @@ public class HistoryController {
 
         processActions(board, actions);
 
-        return new ResponseEntity<>(board, HttpStatus.OK);
+        return ResponseEntity.ok(board.removeClosed());
     }
 
     /**
@@ -92,14 +92,82 @@ public class HistoryController {
                 case "updateCard":
                     processUpdateCard(board, root);
                     break;
+                case "copyCard":
                 case "createCard":
                     processCreateCard(board, root);
+                    break;
+                case "deleteCard":
+                    processDeleteCard(board, root);
+                    break;
+
+                case "updateList":
+                    processUpdateList(board, root);
+                    break;
+                case "createList":
+                    processCreateList(board, root);
                     break;
                 default:
                     logger.error("unknown action type");
             }
         }
         logger.info("done\n");
+    }
+
+    /**
+     * A list was created, so we need to delete it
+     *
+     * @param board The board to modify
+     * @param root  The data
+     */
+    private void processCreateList(TrelloBoard board, JsonObject root) {
+        String listId = root.getAsJsonObject("list").get("id").getAsString();
+        board.lists.remove(listId);
+    }
+
+    /**
+     * A list has been updated
+     *
+     * @param board The board to modify
+     * @param root  The data
+     */
+    private void processUpdateList(TrelloBoard board, JsonObject root) {
+        String listId = root.getAsJsonObject("list").get("id").getAsString();
+        TrelloList list = board.lists.get(listId);
+
+        JsonObject actionData = root.getAsJsonObject("old");
+        Set<String> keys = actionData.keySet();
+        for (String key : keys) {
+            logger.info(key);
+            switch (key) {
+                case "pos": // List position changed
+                    list.pos = actionData.get(key).getAsFloat();
+                    break;
+                case "closed": // List was closed/opened
+                    list.closed = actionData.get(key).getAsBoolean();
+                case "name": // List name changed
+                    list.name = actionData.get(key).getAsString();
+                    break;
+                default: // Unknown field
+                    logger.info("unknown data field: " + key);
+                    break;
+            }
+        }
+    }
+
+    /**
+     * A card was deleted
+     * So we need to create it
+     *
+     * @param board The board to modify
+     * @param root  The data
+     */
+    private void processDeleteCard(TrelloBoard board, JsonObject root) {
+        String cardId = root.getAsJsonObject("card").get("id").getAsString();
+        String listId = root.getAsJsonObject("list").get("id").getAsString();
+        TrelloList list = board.lists.get(listId);
+        // We don;t have any data, so we have to put in defaults
+        TrelloCard newCard = new TrelloCard(cardId, "", "", 0, true);
+        list.cards.put(cardId, newCard);
     }
 
     /**
@@ -138,23 +206,25 @@ public class HistoryController {
 
         TrelloCard card = board.lists.get(listId).cards.get(cardId);
         for (String key : keys) {
+            logger.info(key);
             switch (key) {
-                case "pos":
+                case "pos": // Card moved in a list
                     card.pos = actionData.get(key).getAsFloat();
                     break;
-                case "name":
+                case "name": // Card name changed
                     card.name = actionData.get(key).getAsString();
                     break;
-                case "desc":
+                case "desc": // Card description changed
                     card.desc = actionData.get(key).getAsString();
                     break;
-                case "idList":
+                case "idList": // Card moved from one list to another
                     TrelloList priorList = board.lists.get(actionData.get(key).getAsString());
                     TrelloList currentList = board.lists.get(listId);
                     priorList.cards.put(card.id, card);
                     currentList.cards.remove(card.id);
                     break;
-                case "closed":
+                case "closed": // Card was closed/opened
+                    card.closed = actionData.get(key).getAsBoolean();
                     break;
                 default:
                     logger.info("unknown data field: " + key);
@@ -176,6 +246,14 @@ public class HistoryController {
                 lists.put(rawList.id, new TrelloList(rawList, rawBoard.cards));
             }
         }
+
+        TrelloBoard removeClosed() {
+            lists.values().removeIf(list -> list.closed);// Remove the closed lists
+            lists.values() // Get each of the lists
+                    .forEach(list -> list.cards.values() //  Get the cards in the list
+                            .removeIf(trelloCard -> trelloCard.closed)); // Remove them from the list if they are closed
+            return this;
+        }
     }
 
     /**
@@ -185,12 +263,14 @@ public class HistoryController {
         public String id;
         public String name;
         public float pos;
+        public boolean closed;
         public Map<String, TrelloCard> cards = new HashMap<>();
 
         public TrelloList(RawBoard.RawList rawList, RawBoard.RawCard[] rawCards) {
             id = rawList.id;
             name = rawList.name;
             pos = rawList.pos;
+            closed = rawList.closed;
             Arrays.stream(rawCards)
                     .filter(rawCard -> rawCard.idList.equals(id))
                     .forEach(rawCard -> cards.put(rawCard.id, new TrelloCard(rawCard)));
@@ -205,12 +285,22 @@ public class HistoryController {
         public String desc;
         public String name;
         public float pos;
+        public boolean closed;
+
+        public TrelloCard(String id, String desc, String name, float pos, boolean closed) {
+            this.id = id;
+            this.desc = desc;
+            this.name = name;
+            this.pos = pos;
+            this.closed = closed;
+        }
 
         public TrelloCard(RawBoard.RawCard rawCard) {
             id = rawCard.id;
             desc = rawCard.desc;
             name = rawCard.name;
             pos = rawCard.pos;
+            closed = rawCard.closed;
         }
     }
 
@@ -232,6 +322,7 @@ public class HistoryController {
             public String idList;
             public String name;
             public float pos;
+            public boolean closed;
         }
 
         /**
@@ -239,6 +330,7 @@ public class HistoryController {
          */
         private static class RawList {
             public String id;
+            public boolean closed;
             public String name;
             public float pos;
         }
