@@ -16,8 +16,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * The DataExportController class will act as an endpoint that deals with generating and manipulating data to be
@@ -44,7 +43,7 @@ public class DataExportController {
      * @return - Will return a CSV-friendly response of actions and members.
      */
     @GetMapping("/data/export/{boardId}")
-    ResponseEntity<TrelloDataExport> exportData(@PathVariable String boardId, @RequestParam String token) {
+    ResponseEntity<List<TrelloDataExport>> exportData(@PathVariable String boardId, @RequestParam String token) {
 
         // Grab all actions stored corresponding to the board id.
         List<Action> actions = _actionRepository.findAllByBoard(boardId);
@@ -64,21 +63,29 @@ public class DataExportController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        // Grab each member's detailed information individually.
-        List<MemberResponse> listOfMembers = new ArrayList<MemberResponse>();
+        // Grab each member's detailed information individually and store in a HashMap.
+        HashMap<String, MemberResponse> mapOfMembers = new HashMap<>();
         listOfMembersOfABoard.stream()
+                .filter(member -> member != null) // Check if the particular member is null, and if so, filter it out.
                 .forEach(member -> {
-                    ResponseEntity<MemberResponse> memberResponse = GetMember(member.memberId, token);
+                    ResponseEntity<MemberResponse> response = GetMember(member.memberId, token);
 
-                    if (memberResponse != null) {
-                        listOfMembers.add(memberResponse.getBody());
+                    if (response != null) {
+                        mapOfMembers.put(response.getBody().memberId, response.getBody());
                     }
                 });
 
         // With each action, we can get the corresponding member and create a TrelloDataExport object.
+/*        actions.stream()
+                .filter(action -> action != null) // Check if the particular action is null, and if so, filter it out.
+                .forEach(action -> {
+                    Set<String> set = mapOfMembers.keySet();
+                    set.stream()
+                        .forEach(member -> );
+                });*/
 
 
-        return new ResponseEntity<TrelloDataExport>(new TrelloDataExport("","","","",""), HttpStatus.FOUND);
+        return new ResponseEntity<List<TrelloDataExport>>(new ArrayList<TrelloDataExport>(), HttpStatus.FOUND);
     }
 
     /**
