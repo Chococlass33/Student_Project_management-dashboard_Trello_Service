@@ -15,19 +15,33 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 
-
+/**
+ * The DataExportController class will act as an endpoint that deals with generating and manipulating data to be
+ * exported for CSV usage.
+ */
 @RestController
 public class DataExportController {
 
     @Autowired
     private final ActionRepository _actionRepository;
 
-    DataExportController(ActionRepository actionRepository) {
+    /**
+     * Represents the constructor of the class.
+     * @param actionRepository - Injects the action repository for use.
+     */
+    public DataExportController(ActionRepository actionRepository) {
         this._actionRepository = actionRepository;
     }
 
+    /**
+     * The exportData method takes a board ID and token, and will return a CSV-friendly response of actions and members.
+     * @param boardId - ID of the board to extract data from
+     * @param token - Token used to verify request to the Trello API
+     * @return - Will return a CSV-friendly response of actions and members.
+     */
     @GetMapping("/data/export/{boardId}")
     ResponseEntity<TrelloDataExport> exportData(@PathVariable String boardId, @RequestParam String token) {
 
@@ -49,7 +63,44 @@ public class DataExportController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
+        // Grab each member's detailed information individually.
+        List<MemberResponse> listOfMembers = new ArrayList<MemberResponse>();
+        listOfMembersOfABoard.stream()
+                .forEach(member -> {
+                    ResponseEntity<MemberResponse> memberResponse = GetMember(member.memberId, token);
+
+                    if (memberResponse != null) {
+                        listOfMembers.add(memberResponse.getBody());
+                    }
+                });
+
+        // With each action, we can get the corresponding member and create a TrelloDataExport object.
+
         return new ResponseEntity<TrelloDataExport>(new TrelloDataExport("","","","",""), HttpStatus.FOUND);
+    }
+
+    /**
+     * Grabs a member from the Trello API, and returns a ResponseEntity that contains information on the member.
+     * @param memberId - ID of the member to retrieve.
+     * @param token - Token used to verify request to the Trello API
+     * @return - Will return information on the member.
+     */
+    private ResponseEntity<MemberResponse> GetMember(String memberId, String token) {
+
+        URI url = UriComponentsBuilder.fromHttpUrl("https://api.trello.com/1/members/" + memberId)
+                .queryParam("key", BadConfig.API_KEY)
+                .queryParam("token", token)
+                .build().toUri();
+        RestTemplate restTemplate = new RestTemplate();
+
+        ResponseEntity<MemberResponse> responseEntity = restTemplate.exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<MemberResponse>(){});
+
+        // If there is no information found on the particular member, return a response entity with Http status NOT FOUND.
+        if (responseEntity == null) {
+            return null;
+        }
+
+        return responseEntity;
     }
 
     /**
