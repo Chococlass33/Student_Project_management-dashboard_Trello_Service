@@ -5,6 +5,7 @@ import com.spmd.trello.repositories.ActionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -43,7 +44,12 @@ public class DataExportController {
         ResponseEntity<List<BoardMemberResponse>> responseEntity = restTemplate.exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<List<BoardMemberResponse>>(){});
         List<BoardMemberResponse> listOfMembersOfABoard = responseEntity.getBody();
 
-        return ResponseEntity.ok(new TrelloDataExport("","","","",""));
+        // If there are no members in a board found, return response entity with Http status NOT FOUND.
+        if (listOfMembersOfABoard == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        return new ResponseEntity<TrelloDataExport>(new TrelloDataExport("","","","",""), HttpStatus.FOUND);
     }
 
     /**
