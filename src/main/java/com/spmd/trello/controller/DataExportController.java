@@ -15,6 +15,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -76,6 +77,7 @@ public class DataExportController {
 
         // With each action, we can get the corresponding member and create a TrelloDataExport object.
 
+
         return new ResponseEntity<TrelloDataExport>(new TrelloDataExport("","","","",""), HttpStatus.FOUND);
     }
 
@@ -124,6 +126,7 @@ public class DataExportController {
         // Action information.
         public String actionType;
         public String actionData; // This data should be different based on the action.
+        public Timestamp dateCreated; // The timestamp that the action was performed.
     }
 
     /**
