@@ -1,4 +1,6 @@
 package com.spmd.trello.controller;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.spmd.trello.BadConfig;
 import com.spmd.trello.model.Action;
 import com.spmd.trello.repositories.ActionRepository;
@@ -103,7 +105,8 @@ public class DataExportController {
     private List<TrelloDataExport> clarifyActionData(List<TrelloDataExport> exportData) {
         exportData.stream()
                 .forEach(data -> {
-                    data.actionData = determineAction(data);
+                    JsonObject root = JsonParser.parseString(data.actionData).getAsJsonObject();
+                    data.actionData = determineAction(data, root);
                 });
 
         return exportData;
@@ -111,13 +114,28 @@ public class DataExportController {
 
     /**
      * Helper method to convert actionData into readable form.
+     * Possible actions "createCard", "updateCard", "deleteCard", "updateList", "createList", "copyCard".
      * @param data - data object to draw insights from.
      * @return - Will return a string that details the action.
      */
-    private String determineAction(TrelloDataExport data) {
+    private String determineAction(TrelloDataExport data, JsonObject root) {
+        JsonObject actionData = root.getAsJsonObject("old");
+        Set<String> keys = actionData.keySet();
         switch(data.actionType) {
-            default:
+            case "createCard":
                 break;
+            case "updateCard":
+                break;
+            case "deleteCard":
+                break;
+            case "updateList":
+                break;
+            case "createList":
+                break;
+            case "copyCard":
+                break;
+            default:
+                return "Invalid action";
         }
 
         return "";
