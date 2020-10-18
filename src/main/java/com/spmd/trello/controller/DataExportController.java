@@ -90,13 +90,37 @@ public class DataExportController {
                 }).collect(Collectors.toList());
 
         // Update data in the action to be human-readable.
-        clarifyActionData(exportData);
+        exportData = clarifyActionData(exportData);
 
-        return new ResponseEntity<List<TrelloDataExport>>(new ArrayList<TrelloDataExport>(), HttpStatus.FOUND);
+        return new ResponseEntity<List<TrelloDataExport>>(exportData, HttpStatus.FOUND);
     }
 
+    /**
+     * Helper method that traverses a list of TrelloDataExport objects and alters the actionData field to be readable.
+     * @param exportData - data object to manipulate
+     * @return
+     */
     private List<TrelloDataExport> clarifyActionData(List<TrelloDataExport> exportData) {
+        exportData.stream()
+                .forEach(data -> {
+                    data.actionData = determineAction(data);
+                });
+
         return exportData;
+    }
+
+    /**
+     * Helper method to convert actionData into readable form.
+     * @param data - data object to draw insights from.
+     * @return - Will return a string that details the action.
+     */
+    private String determineAction(TrelloDataExport data) {
+        switch(data.actionType) {
+            default:
+                break;
+        }
+
+        return "";
     }
 
     /**
