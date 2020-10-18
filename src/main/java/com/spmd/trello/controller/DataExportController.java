@@ -17,6 +17,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
 import java.sql.Timestamp;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * The DataExportController class will act as an endpoint that deals with generating and manipulating data to be
@@ -76,16 +77,26 @@ public class DataExportController {
                 });
 
         // With each action, we can get the corresponding member and create a TrelloDataExport object.
-/*        actions.stream()
+        List<TrelloDataExport> exportData = actions.stream()
                 .filter(action -> action != null) // Check if the particular action is null, and if so, filter it out.
-                .forEach(action -> {
-                    Set<String> set = mapOfMembers.keySet();
-                    set.stream()
-                        .forEach(member -> );
-                });*/
+                .map(action -> {
+                    MemberResponse memberResponse = mapOfMembers.get(action.getMember());
+                    return new TrelloDataExport(memberResponse.memberId,
+                                                memberResponse.fullName,
+                                                memberResponse.email,
+                                                action.getType(),
+                                                action.getData(),
+                                                action.getDateCreated());
+                }).collect(Collectors.toList());
 
+        // Update data in the action to be human-readable.
+        clarifyActionData(exportData);
 
         return new ResponseEntity<List<TrelloDataExport>>(new ArrayList<TrelloDataExport>(), HttpStatus.FOUND);
+    }
+
+    private List<TrelloDataExport> clarifyActionData(List<TrelloDataExport> exportData) {
+        return exportData;
     }
 
     /**
@@ -117,12 +128,13 @@ public class DataExportController {
      */
     private static class TrelloDataExport {
 
-        public TrelloDataExport(String memberId, String fullName, String email, String actionType, String actionData) {
+        public TrelloDataExport(String memberId, String fullName, String email, String actionType, String actionData, Timestamp dateCreated) {
             this.memberId = memberId;
             this.fullName = fullName;
             this.email = email;
             this.actionType = actionType;
             this.actionData = actionData;
+            this.dateCreated = dateCreated;
         }
 
         // User information.
