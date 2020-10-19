@@ -1,4 +1,4 @@
-package com.spmd.trello.trelloModel;
+package com.spmd.trello.webhooks;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.JsonProcessingException;

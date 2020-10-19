@@ -1,7 +1,10 @@
-package com.spmd.trello.trelloModel;
+package com.spmd.trello.webhooks;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+/**
+ * Response sent by trello upon creating a webhook
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class WebhookResponse {
     public String description;

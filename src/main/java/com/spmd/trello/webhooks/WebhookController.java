@@ -1,11 +1,8 @@
-package com.spmd.trello;
+package com.spmd.trello.webhooks;
 
+import com.spmd.trello.BadConfig;
 import com.spmd.trello.model.Action;
 import com.spmd.trello.repositories.ActionRepository;
-import com.spmd.trello.trelloModel.NewWebhook;
-import com.spmd.trello.trelloModel.WebhookAction;
-import com.spmd.trello.trelloModel.WebhookPost;
-import com.spmd.trello.trelloModel.WebhookResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
