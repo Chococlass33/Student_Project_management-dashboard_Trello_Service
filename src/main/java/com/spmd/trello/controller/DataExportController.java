@@ -119,27 +119,144 @@ public class DataExportController {
      * @return - Will return a string that details the action.
      */
     private String determineAction(TrelloDataExport data, JsonObject root) {
-        JsonObject actionData = root.getAsJsonObject("old");
-        Set<String> keys = actionData.keySet();
+        String resultString = data.fullName;
         switch(data.actionType) {
             case "createCard":
+                resultString += processCreateCard(root);
                 break;
             case "updateCard":
+                resultString += processUpdateCard(root);
                 break;
             case "deleteCard":
+                resultString += processDeleteCard(root);
                 break;
             case "updateList":
+                resultString += processUpdateList(root);
                 break;
             case "createList":
+                resultString += processCreateList(root);
                 break;
             case "copyCard":
+                resultString += " copied a card to the board.";
+//                resultString += processCopyCard(root);
                 break;
             default:
                 return "Invalid action";
         }
 
-        return "";
+        return resultString;
     }
+
+    /**
+     * Processes the createCard action, and returns a human-readable string.
+     * @param root - data object with the action information
+     * @return - returns a relevant string for describing the action
+     */
+    private String processCreateCard(JsonObject root) {
+        String cardName = root.getAsJsonObject("card").get("name").getAsString();
+
+        return " created card with name \"" + cardName + "\".";
+    }
+
+    /**
+     * Processes the updateCard action, and returns a human-readable string.
+     * @param root - data object with the action information
+     * @return - returns a relevant string for describing the action
+     */
+    private String processUpdateCard(JsonObject root) {
+        JsonObject actionData = root.getAsJsonObject("old");
+        Set<String> keys = actionData.keySet();
+
+        String resultantOutcome = " updated the card \"" + root.getAsJsonObject("card").get("name").getAsString() + "\"'s ";
+
+        for (String key : keys) {
+            switch(key) {
+                case "pos": // Card moved in a list
+                    resultantOutcome += "position.";
+                    break;
+                case "name": // Card name changed
+                    resultantOutcome += "name to \"" + root.getAsJsonObject("card").get("name").getAsString() + "\".";
+                    break;
+                case "desc": // Card description changed
+                    resultantOutcome += "description from \"" + actionData.get("desc").getAsString() + "\" to \"" + root.getAsJsonObject("card").get("desc").getAsString() + "\".";
+                    break;
+                case "idList": // Card moved from one list to another
+                    resultantOutcome += "list from \"" + actionData.get("id").getAsString() + "\" to \"" + root.getAsJsonObject("listAfter").get("name").getAsString() + "\".";
+                    break;
+                case "closed": // Card was closed/opened
+                    resultantOutcome += "status from \"" + actionData.get("closed").getAsBoolean() + "\" to \"" + !actionData.get("closed").getAsBoolean() + "\".";
+                    break;
+                default:
+                    resultantOutcome = " updated the card.";
+                    break;
+            }
+        }
+
+        return resultantOutcome;
+    }
+
+    /**
+     * Processes the deleteCard action, and returns a human-readable string.
+     * @param root - data object with the action information
+     * @return - returns a relevant string for describing the action
+     */
+    private String processDeleteCard(JsonObject root) {
+        String cardName = root.getAsJsonObject("card").get("name").getAsString();
+
+        return " deleted card with name \"" + cardName + "\".";
+    }
+
+    /**
+     * Processes the updateList action, and returns a human-readable string.
+     * @param root - data object with the action information
+     * @return - returns a relevant string for describing the action
+     */
+    private String processUpdateList(JsonObject root) {
+        JsonObject actionData = root.getAsJsonObject("old");
+        Set<String> keys = root.keySet();
+
+        String resultantOutcome = " updated the list \"" + root.getAsJsonObject("list").get("name").getAsString() + "\"'s ";
+
+        for (String key : keys) {
+            switch (key) {
+                case "pos":
+                    resultantOutcome += "position.";
+                    break;
+                case "name":
+                    resultantOutcome += "name to \"" + root.getAsJsonObject("list").get("name").getAsString() + "\".";
+                    break;
+                case "closed":
+                    resultantOutcome += "status from \"" + actionData.get("closed").getAsBoolean() + "\" to \"" + !actionData.get("closed").getAsBoolean() + "\".";
+                    break;
+                default:
+                    resultantOutcome = " updated the list.";
+                    break;
+            }
+        }
+
+        return resultantOutcome;
+    }
+
+    /**
+     * Processes the createList action, and returns a human-readable string.
+     * @param root - data object with the action information
+     * @return - returns a relevant string for describing the action
+     */
+    private String processCreateList(JsonObject root) {
+        String listName = root.getAsJsonObject("list").get("name").getAsString();
+
+        return " created list with name \"" + listName + "\".";
+    }
+
+//    /**
+//     * Processes the copyCard action, and returns a human-readable string.
+//     * @param root - data object with the action information
+//     * @return - returns a relevant string for describing the action
+//     */
+//    private String processCopyCard(JsonObject root) {
+//        Set<String> keys = root.keySet();
+//
+//    }
 
     /**
      * Grabs a member from the Trello API, and returns a ResponseEntity that contains information on the member.
