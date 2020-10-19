@@ -3,6 +3,10 @@ package com.spmd.trello.controller;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.spmd.trello.BadConfig;
+import com.spmd.trello.RawBoard;
+import com.spmd.trello.TrelloBoard;
+import com.spmd.trello.TrelloCard;
+import com.spmd.trello.TrelloList;
 import com.spmd.trello.database.Action;
 import com.spmd.trello.database.ActionRepository;
 import org.slf4j.Logger;
@@ -19,11 +23,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.sql.Date;
-import java.util.Arrays;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -230,109 +231,6 @@ public class HistoryController {
                     logger.info("unknown data field: " + key);
                     break;
             }
-        }
-    }
-
-    /**
-     * Represents the current state of the trello board
-     */
-    private static class TrelloBoard {
-        public String name;
-        public Map<String, TrelloList> lists = new HashMap<>();
-
-        public TrelloBoard(RawBoard rawBoard) {
-            name = rawBoard.name;
-            for (RawBoard.RawList rawList : rawBoard.lists) {
-                lists.put(rawList.id, new TrelloList(rawList, rawBoard.cards));
-            }
-        }
-
-        TrelloBoard removeClosed() {
-            lists.values().removeIf(list -> list.closed);// Remove the closed lists
-            lists.values() // Get each of the lists
-                    .forEach(list -> list.cards.values() //  Get the cards in the list
-                            .removeIf(trelloCard -> trelloCard.closed)); // Remove them from the list if they are closed
-            return this;
-        }
-    }
-
-    /**
-     * Represents the current state of a trello list
-     */
-    private static class TrelloList {
-        public String id;
-        public String name;
-        public float pos;
-        public boolean closed;
-        public Map<String, TrelloCard> cards = new HashMap<>();
-
-        public TrelloList(RawBoard.RawList rawList, RawBoard.RawCard[] rawCards) {
-            id = rawList.id;
-            name = rawList.name;
-            pos = rawList.pos;
-            closed = rawList.closed;
-            Arrays.stream(rawCards)
-                    .filter(rawCard -> rawCard.idList.equals(id))
-                    .forEach(rawCard -> cards.put(rawCard.id, new TrelloCard(rawCard)));
-        }
-    }
-
-    /**
-     * Represents the current state of a trello card
-     */
-    private static class TrelloCard {
-        public String id;
-        public String desc;
-        public String name;
-        public float pos;
-        public boolean closed;
-
-        public TrelloCard(String id, String desc, String name, float pos, boolean closed) {
-            this.id = id;
-            this.desc = desc;
-            this.name = name;
-            this.pos = pos;
-            this.closed = closed;
-        }
-
-        public TrelloCard(RawBoard.RawCard rawCard) {
-            id = rawCard.id;
-            desc = rawCard.desc;
-            name = rawCard.name;
-            pos = rawCard.pos;
-            closed = rawCard.closed;
-        }
-    }
-
-
-    /**
-     * The raw trello board data returned from the api
-     */
-    private static class RawBoard {
-        public String name;
-        public RawCard[] cards;
-        public RawList[] lists;
-
-        /**
-         * The raw trello care data returned from the api
-         */
-        private static class RawCard {
-            public String id;
-            public String desc;
-            public String idList;
-            public String name;
-            public float pos;
-            public boolean closed;
-        }
-
-        /**
-         * The raw trello list data returned from the api
-         */
-        private static class RawList {
-            public String id;
-            public boolean closed;
-            public String name;
-            public float pos;
         }
     }
 
