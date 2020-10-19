@@ -27,4 +27,8 @@ public class TrelloCard {
         pos = rawCard.pos;
         closed = rawCard.closed;
     }
+
+    public TrelloCard clone() {
+        return new TrelloCard(id, desc, name, pos, closed);
+    }
 }

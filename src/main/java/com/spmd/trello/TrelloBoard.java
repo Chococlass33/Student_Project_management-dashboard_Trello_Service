@@ -1,5 +1,6 @@
 package com.spmd.trello;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -9,6 +10,11 @@ import java.util.Map;
 public class TrelloBoard {
     public String name;
     public Map<String, TrelloList> lists = new HashMap<>();
+
+    public TrelloBoard(String name, Collection<TrelloList> lists) {
+        this.name = name;
+        lists.forEach(list -> this.lists.put(list.id, list.clone()));
+    }
 
     public TrelloBoard(RawBoard rawBoard) {
         name = rawBoard.name;
@@ -23,5 +29,9 @@ public class TrelloBoard {
                 .forEach(list -> list.cards.values() //  Get the cards in the list
                         .removeIf(trelloCard -> trelloCard.closed)); // Remove them from the list if they are closed
         return this;
+    }
+
+    public TrelloBoard clone() {
+        return new TrelloBoard(name, lists.values());
     }
 }
