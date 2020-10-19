@@ -1,4 +1,4 @@
-package com.spmd.trello.model;
+package com.spmd.trello.database;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
