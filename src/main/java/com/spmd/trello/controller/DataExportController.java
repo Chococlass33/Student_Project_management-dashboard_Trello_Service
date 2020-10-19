@@ -17,7 +17,6 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
-import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -153,9 +152,7 @@ public class DataExportController {
      * @return - returns a relevant string for describing the action
      */
     private String processCreateCard(JsonObject root) {
-        String cardName = root.getAsJsonObject("card").get("name").getAsString();
-
-        return " created card with name \"" + cardName + "\".";
+        return " created card with name \"" + root.getAsJsonObject("card").get("name").getAsString() + "\".";
     }
 
     /**
@@ -201,9 +198,7 @@ public class DataExportController {
      * @return - returns a relevant string for describing the action
      */
     private String processDeleteCard(JsonObject root) {
-        String cardName = root.getAsJsonObject("card").get("name").getAsString();
-
-        return " deleted card with name \"" + cardName + "\".";
+        return " deleted card with name \"" + root.getAsJsonObject("card").get("name").getAsString() + "\".";
     }
 
     /**
@@ -243,9 +238,7 @@ public class DataExportController {
      * @return - returns a relevant string for describing the action
      */
     private String processCreateList(JsonObject root) {
-        String listName = root.getAsJsonObject("list").get("name").getAsString();
-
-        return " created list with name \"" + listName + "\".";
+        return " created list with name \"" + root.getAsJsonObject("list").get("name").getAsString() + "\".";
     }
 
 //    /**
@@ -265,7 +258,6 @@ public class DataExportController {
      * @return - Will return information on the member.
      */
     private ResponseEntity<MemberResponse> GetMember(String memberId, String token) {
-
         URI url = UriComponentsBuilder.fromHttpUrl("https://api.trello.com/1/members/" + memberId)
                 .queryParam("key", BadConfig.API_KEY)
                 .queryParam("token", token)
