@@ -58,7 +58,7 @@ public class DataExportController {
                 .build().toUri();
         RestTemplate restTemplate = new RestTemplate();
 
-        ResponseEntity<List<BoardMemberResponse>> responseEntity = restTemplate.exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<List<BoardMemberResponse>>(){});
+        ResponseEntity<List<BoardMemberResponse>> responseEntity = restTemplate.exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<>(){});
         List<BoardMemberResponse> listOfMembersOfABoard = responseEntity.getBody();
 
         // If there are no members in a board found, return response entity with Http status NOT FOUND.
@@ -88,13 +88,13 @@ public class DataExportController {
                                                 memberResponse.email,
                                                 action.getType(),
                                                 action.getData(),
-                                                action.getDateCreated());
+                                                new Date(action.getDateCreated().getTime()));
                 }).collect(Collectors.toList());
 
         // Update data in the action to be human-readable.
         exportData = clarifyActionData(exportData);
 
-        return new ResponseEntity<List<TrelloDataExport>>(exportData, HttpStatus.FOUND);
+        return new ResponseEntity<>(exportData, HttpStatus.FOUND);
     }
 
     /**
@@ -272,7 +272,7 @@ public class DataExportController {
                 .build().toUri();
         RestTemplate restTemplate = new RestTemplate();
 
-        ResponseEntity<MemberResponse> responseEntity = restTemplate.exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<MemberResponse>(){});
+        ResponseEntity<MemberResponse> responseEntity = restTemplate.exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<>(){});
 
         // If there is no information found on the particular member, return a response entity with Http status NOT FOUND.
         if (responseEntity == null) {
@@ -287,7 +287,7 @@ public class DataExportController {
      */
     private static class TrelloDataExport {
 
-        public TrelloDataExport(String memberId, String fullName, String email, String actionType, String actionData, Timestamp dateCreated) {
+        public TrelloDataExport(String memberId, String fullName, String email, String actionType, String actionData, Date dateCreated) {
             this.memberId = memberId;
             this.fullName = fullName;
             this.email = email;
@@ -304,7 +304,7 @@ public class DataExportController {
         // Action information.
         public String actionType;
         public String actionData; // This data should be different based on the action.
-        public Timestamp dateCreated; // The timestamp that the action was performed.
+        public Date dateCreated; // The timestamp that the action was performed.
     }
 
     /**
