@@ -27,6 +27,7 @@ import java.util.Map;
 
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 
 @RestController
 public class BurndownController {
@@ -38,7 +39,7 @@ public class BurndownController {
     }
 
     @GetMapping("/data/burndown/{boardId}")
-    ResponseEntity<Map<Instant, TrelloBoard>> boardHistory(@PathVariable String boardId, @RequestParam String token) {
+    ResponseEntity<ChartData> boardHistory(@PathVariable String boardId, @RequestParam String token) {
         /* Get the current state of the board */
         URI url = UriComponentsBuilder.fromHttpUrl("https://api.trello.com/1/boards/" + boardId)
                 .queryParam("key", BadConfig.API_KEY)
@@ -62,7 +63,7 @@ public class BurndownController {
 
         if (actions.size() == 0) {
             // we have nothing
-            return new ResponseEntity<>(HttpStatus.OK);
+            return ResponseEntity.ok(new ChartData());
         }
 
         /* Get the oldest date */
@@ -102,8 +103,34 @@ public class BurndownController {
 
         boardStates.put(oldestDate, board); // Put the final board state
 
+        ChartData data = new ChartData();
+        data.boardName = board.name;
 
-        return ResponseEntity.ok(boardStates);
+        boardStates.forEach((instant, trelloBoard) ->
+                data.listSizes.put( //Add in a new entry for this state
+                        instant, // The instant of this state
+                        trelloBoard.lists // Get the trello lists
+                                .values().stream() // Stream them
+                                .collect(toMap( // Convert them into a map
+                                        list -> list.id, // Get the key of the list
+                                        list -> new ListEntry(list.name, list.cards.size()))))); //Get the size and name of the list
+
+        return ResponseEntity.ok(data);
+    }
+
+    private static class ChartData {
+        public String boardName;
+        public Map<Instant, Map<String, ListEntry>> listSizes = new HashMap<>();
+    }
+
+    private static class ListEntry {
+        public String name;
+        public int size;
+
+        public ListEntry(String name, int size) {
+            this.name = name;
+            this.size = size;
+        }
     }
 
 }
