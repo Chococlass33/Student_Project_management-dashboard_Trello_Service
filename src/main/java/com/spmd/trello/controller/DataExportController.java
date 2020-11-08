@@ -68,12 +68,12 @@ public class DataExportController {
         // Grab each member's detailed information individually and store in a HashMap.
         HashMap<String, MemberResponse> mapOfMembers = new HashMap<>();
         listOfMembersOfABoard.stream()
-                .filter(member -> member != null) // Check if the particular member is null, and if so, filter it out.
+                .filter(Objects::nonNull) // Check if the particular member is null, and if so, filter it out.
                 .forEach(member -> {
-                    ResponseEntity<MemberResponse> response = GetMember(member.memberId, token);
+                    MemberResponse response = GetMember(member.id, token);
 
                     if (response != null) {
-                        mapOfMembers.put(response.getBody().memberId, response.getBody());
+                        mapOfMembers.put(response.id, response);
                     }
                 });
 
@@ -82,7 +82,7 @@ public class DataExportController {
                 .filter(action -> action != null) // Check if the particular action is null, and if so, filter it out.
                 .map(action -> {
                     MemberResponse memberResponse = mapOfMembers.get(action.getMember());
-                    return new TrelloDataExport(memberResponse.memberId,
+                    return new TrelloDataExport(memberResponse.id,
                                                 memberResponse.fullName,
                                                 memberResponse.email,
                                                 action.getType(),
@@ -257,21 +257,15 @@ public class DataExportController {
      * @param token - Token used to verify request to the Trello API
      * @return - Will return information on the member.
      */
-    private ResponseEntity<MemberResponse> GetMember(String memberId, String token) {
+    private MemberResponse GetMember(String memberId, String token) {
         URI url = UriComponentsBuilder.fromHttpUrl("https://api.trello.com/1/members/" + memberId)
                 .queryParam("key", BadConfig.API_KEY)
                 .queryParam("token", token)
                 .build().toUri();
         RestTemplate restTemplate = new RestTemplate();
 
-        ResponseEntity<MemberResponse> responseEntity = restTemplate.exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<>(){});
 
-        // If there is no information found on the particular member, return a response entity with Http status NOT FOUND.
-        if (responseEntity == null) {
-            return null;
-        }
-
-        return responseEntity;
+        return restTemplate.getForObject(url, MemberResponse.class);
     }
 
     /**
@@ -304,14 +298,14 @@ public class DataExportController {
      * This will only contain an ID as a means of subsequently and individually accessing a member's details.
      */
     private static class BoardMemberResponse {
-        public String memberId;
+        public String id;
     }
 
     /**
      * Represents a subset of the structure of the response from getting a particular member from the Trello API.
      */
     private static class MemberResponse {
-        public String memberId;
+        public String id;
         public String fullName;
         public String email;
     }
