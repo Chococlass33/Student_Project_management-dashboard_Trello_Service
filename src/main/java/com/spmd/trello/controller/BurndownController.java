@@ -67,7 +67,7 @@ public class BurndownController {
             boardStates.put(Instant.now().truncatedTo(ChronoUnit.DAYS), board);
             ChartData data = convertToSizes(boardStates);
             data.boardName = board.name;
-            return ResponseEntity.ok(new ChartData());
+            return ResponseEntity.ok(data);
         }
 
         /* Get the oldest date */
