@@ -63,6 +63,10 @@ public class BurndownController {
 
         if (actions.size() == 0) {
             // we have nothing
+            Map<Instant, TrelloBoard> boardStates = new HashMap<>();
+            boardStates.put(Instant.now().truncatedTo(ChronoUnit.DAYS), board);
+            ChartData data = convertToSizes(boardStates);
+            data.boardName = board.name;
             return ResponseEntity.ok(new ChartData());
         }
 
@@ -103,9 +107,15 @@ public class BurndownController {
 
         boardStates.put(oldestDate, board); // Put the final board state
 
-        ChartData data = new ChartData();
+
+        ChartData data = convertToSizes(boardStates);
         data.boardName = board.name;
 
+        return ResponseEntity.ok(data);
+    }
+
+    private ChartData convertToSizes( Map<Instant, TrelloBoard> boardStates){
+        ChartData data = new ChartData();
         boardStates.forEach((instant, trelloBoard) ->
                 data.listSizes.put( //Add in a new entry for this state
                         instant, // The instant of this state
@@ -114,8 +124,7 @@ public class BurndownController {
                                 .collect(toMap( // Convert them into a map
                                         list -> list.id, // Get the key of the list
                                         list -> new ListEntry(list.name, list.cards.size()))))); //Get the size and name of the list
-
-        return ResponseEntity.ok(data);
+        return data;
     }
 
     private static class ChartData {
