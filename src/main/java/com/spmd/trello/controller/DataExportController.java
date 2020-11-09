@@ -152,7 +152,7 @@ public class DataExportController {
      * @return - returns a relevant string for describing the action
      */
     private String processCreateCard(JsonObject root) {
-        return " created card with name \"" + root.getAsJsonObject("card").get("name").getAsString() + "\".";
+        return " created card with name \"" + root.getAsJsonObject("card").get("id").getAsString() + "\".";
     }
 
     /**
@@ -164,7 +164,7 @@ public class DataExportController {
         JsonObject actionData = root.getAsJsonObject("old");
         Set<String> keys = actionData.keySet();
 
-        String resultantOutcome = " updated the card \"" + root.getAsJsonObject("card").get("name").getAsString() + "\"'s ";
+        String resultantOutcome = " updated the card \"" + root.getAsJsonObject("card").get("id").getAsString() + "\"'s ";
 
         for (String key : keys) {
             switch(key) {
@@ -178,7 +178,7 @@ public class DataExportController {
                     resultantOutcome += "description from \"" + actionData.get("desc").getAsString() + "\" to \"" + root.getAsJsonObject("card").get("desc").getAsString() + "\".";
                     break;
                 case "idList": // Card moved from one list to another
-                    resultantOutcome += "list from \"" + actionData.get("id").getAsString() + "\" to \"" + root.getAsJsonObject("listAfter").get("name").getAsString() + "\".";
+                    resultantOutcome += "list from \"" + actionData.get("idList").getAsString() + "\" to \"" + root.getAsJsonObject("listAfter").get("id").getAsString() + "\".";
                     break;
                 case "closed": // Card was closed/opened
                     resultantOutcome += "status from \"" + actionData.get("closed").getAsBoolean() + "\" to \"" + !actionData.get("closed").getAsBoolean() + "\".";
@@ -198,7 +198,7 @@ public class DataExportController {
      * @return - returns a relevant string for describing the action
      */
     private String processDeleteCard(JsonObject root) {
-        return " deleted card with name \"" + root.getAsJsonObject("card").get("name").getAsString() + "\".";
+        return " deleted card with name \"" + root.getAsJsonObject("card").get("id").getAsString() + "\".";
     }
 
     /**
@@ -210,7 +210,7 @@ public class DataExportController {
         JsonObject actionData = root.getAsJsonObject("old");
         Set<String> keys = root.keySet();
 
-        String resultantOutcome = " updated the list \"" + root.getAsJsonObject("list").get("name").getAsString() + "\"'s ";
+        String resultantOutcome = " updated the list \"" + root.getAsJsonObject("list").get("id").getAsString() + "\"'s ";
 
         for (String key : keys) {
             switch (key) {
@@ -238,7 +238,7 @@ public class DataExportController {
      * @return - returns a relevant string for describing the action
      */
     private String processCreateList(JsonObject root) {
-        return " created list with name \"" + root.getAsJsonObject("list").get("name").getAsString() + "\".";
+        return " created list with name \"" + root.getAsJsonObject("list").get("id").getAsString() + "\".";
     }
 
 //    /**
