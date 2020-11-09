@@ -1,0 +1,19 @@
+image: node:latest
+
+before_script:
+  - apt-get update -qy
+  - apt-get install -y ruby-dev
+  - gem install dpl
+
+stages:
+  - staging
+  - production
+
+staging:
+  type: deploy
+  stage: staging
+  image: ruby:latest
+  script:
+    - dpl --provider=heroku --app=trello-backend-1 --api-key=4588ec09-3b77-4480-9191-936add9b9308
+  only:
+    - develop
