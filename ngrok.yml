@@ -1,0 +1,5 @@
+authtoken: 78AxMyRottVhyo6Upikhw_onxUv2Mv4SE3QmrZj6Zf
+region: au
+tunnels:
+    addr: 5002
+    proto: http
